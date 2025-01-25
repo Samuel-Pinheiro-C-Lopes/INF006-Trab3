@@ -26,8 +26,8 @@
         // próximo, ele é capaz de armazenar as listas e árvores
         // correspondentes a cada linha
         struct gerLinhas {
-            Arvore *arvore;
-            CbctLista *listas;
+            Arvore *inicioArvores;
+            Lista *inicioListas;
         };
 
         // sumário: cabeçote que aponta para início da lista
@@ -195,6 +195,70 @@ int main (void) {
             }
 
             //////////////////////////////
+
+    #pragma endregion
+
+    #pragma region Matematica
+
+        // Sumário: Obtém a quantidade de algarismos presentes em um número
+        // inteiro
+        // Parâmetros: <inteiro: número cujos algarismos devem ser contabilizados>
+        // Retorna: <int: quantidade de algarismos>
+        int qntAlgsInt(int inteiro){
+            static int qntAlgs;
+
+            if (inteiro == 0)
+                return 1;
+            else 
+                for (qntAlgs = 0; inteiro != 0; qntAlgs++)
+                    inteiro /= 10;
+
+            return qntAlgs;
+        }
+
+        // Sumário: eleva um determinado número inteiro por um expoente também inteiro
+        // Parâmetros: <inteiro: número a ser elevado, base> e <expoente>
+        // Retorna: <int: resultado da exponencialização>
+        int expInt(int inteiro, int exp){
+            int resultado = inteiro;
+            if (exp == 0)
+                return 1; // todo número ^0 é 1
+            else if (exp < 0)
+                return -1; // erro
+            else // eleve normalmente
+                for (; exp > 1; exp--)
+                    resultado *= inteiro;
+
+            return resultado;
+        }
+
+        // Sumário: Converte um inteiro para uma cadeia de caracteres
+        // com seu conteúdo
+        // Parâmetros: <inteiro: número inteiro a ser lido>
+        // Retorna: <char *: ponteiro para a cadeia resultante>
+        char* convIntStr(int inteiro){
+            static char str[tam_max_substr];
+            char *idx = str;
+            int numGrandezaAtual;
+
+            if (inteiro < 0)
+            {
+                *(idx) = '-';
+                inteiro *= -1;
+                idx += sizeof(char);
+            }
+
+            for (int numAlgs = qntAlgsInt(inteiro); numAlgs > 0; numAlgs--)
+            {
+                numGrandezaAtual = inteiro / (expInt(10, numAlgs - 1));
+                *(idx) = numGrandezaAtual + 48;
+                inteiro -= numGrandezaAtual * expInt(10, numAlgs - 1);
+                idx += sizeof(char);
+            }
+            *(idx) = '\0';
+
+            return str;
+        }
 
     #pragma endregion
 
