@@ -4,7 +4,7 @@
 //////////////////////////////
 
 #define tam_max_linha (1000)
-#define tam_max_subcadeia (255)
+#define tam_max_substr (255)
 
 //////////////////////////////
 
@@ -14,9 +14,9 @@
 
     #pragma region Estruturas
 
-        typedef struct lista Lista;
+        typedef struct itemLista ItemLista;
         typedef struct no No;
-        typedef struct cbctLista CbctLista;
+        typedef struct lista Lista;
         typedef struct arvore Arvore;
         typedef struct gerLinhas GerLinhas;
 
@@ -31,15 +31,15 @@
         };
 
         // sumário: cabeçote que aponta para início da lista
-        struct cbctLista {
-            CbctLista *prox;
-            Lista *inicio;
+        struct Lista {
+            Lista *prox;
+            ItemLista *inicio;
         };
 
         // sumário: lista para receber a sequência de inteiros 
         // da entrada
-        struct lista {
-            Lista *prox;
+        struct itemLista {
+            ItemLista *prox;
             int valor;
         };
 
@@ -72,7 +72,36 @@
 
         //////////////////////////////
 
-        #pragma region Cadeia
+        #pragma region Inicializar
+
+            // ger
+            GerLinhas *inicializarGerLinhas();
+            // arvore
+            Arvore *inicializarArvore();
+            No *inicializarNo(int valor);
+            // lista
+            Lista *inicializarLista();
+            ItemLista *inicializarItemLista(int valor);
+
+        #pragma endregion
+
+        //////////////////////////////
+
+        #pragma region Adicionar
+
+            // ger
+            void adicionarLista(GerLinhas *ger, Lista *lista);
+            void adicionarArvore(GerLinhas *ger, Arvore *arv);
+            // arvore
+            void adicionarNoArv(Arvore *arv, No *no);
+            // lista
+            void adicionarItemLista(Lista *lista, ItemLista *item);
+
+        #pragma endregion
+
+        //////////////////////////////
+
+        #pragma region String
 
             char* obterSubstr(char *str, char *separadores);
             char* proxOcorrencia(char *str, char *alvos);
@@ -112,5 +141,63 @@ int main (void) {
 #pragma endregion
 
 #pragma region AUXILIARES
+
+    //////////////////////////////
+
+    #pragma region String
+
+            //////////////////////////////
+
+            // Sumário: obtém a substring de início igual ao ponteiro de caracter
+            // passado e final fim da cadeia ou primeira ocorrência de um dos 
+            // separadores
+            // Parâmetros: <str: ponteiro para o início da string> e <separadores:
+            // string dos separadores, caracteres que finalizam a substring além do
+            // '\0'
+            // Retorna: ponteiro para a substring formada.
+            char* obterSubstr(char *str, char *separadores) {
+                static char substr[tam_max_substr];
+                char *idx = substr;
+                int i, j;
+
+                for(i = 0; str[i] != '\n'; i++) {
+                    for (j = 0; separadores[j] != '\0'; j++)
+                        if (separadores[j] == str[i])
+                            break;
+
+                    idx[i] = str[i];
+                }
+
+                return substr;
+            }
+
+            //////////////////////////////
+
+            // Sumário: busca pela próxima ocorrência de certos alvos
+            // em uma string e retorna o seu ponteiro
+            // Parâmetros: <str: string alvo> <alvos: caracteres que finalizarão
+            // a busca>
+            // Retorna: <char *: ponteiro para a primeira ocorrência de um dos alvos>
+            char* proxOcorrencia(char *str, char *alvos) {
+                char *idx = str;
+                int i, j;
+                
+                // para cara char da entrada
+                for (i = 0; str[i] != '\0'; i++)
+                    // verifica por igualdade com algum alvo
+                    for (j = 0; alvos[j] != '\0'; j++)
+                        if (alvos[j] == str[i])
+                            break;    
+
+                // retorna ponteiro da primeira ocorrência 
+                // de um dos alvos ou '\0'
+                return &idx[i]; 
+            }
+
+            //////////////////////////////
+
+    #pragma endregion
+
+    //////////////////////////////
 
 #pragma endregion
