@@ -105,6 +105,7 @@
 
             char* obterSubstr(char *str, char *separadores);
             char* proxOcorrencia(char *str, char *alvos);
+            int checarCharInt(char c);
 
         #pragma endregion
 
@@ -194,11 +195,59 @@ int main (void) {
                 return &idx[i]; 
             }
 
+            int checarCharInt(char c){
+                if (c > 47 && c < 58)
+                    return 1;
+                else 
+                    return 0;
+            }
+
             //////////////////////////////
 
     #pragma endregion
 
+    //////////////////////////////
+
+    #pragma region Conversões
+
+        //////////////////////////////
+
+        // Sumário: converte um texto para seu equivalente numérico inteiro
+        // Parâmetros: <str: indexador da string a ser convertida>
+        // Retorna: <int: numero resultante>
+        int convStrInt(char* str){
+            // propriedades
+            int inteiro = 0;
+            int sinal = 1;
+            int i = 0;
+
+            // se for negativo
+            if (str[i] == '-')
+            {
+                sinal = -1; 
+                i++;
+            }
+
+            // enquanto  não encontrar o final da linha
+            while (checarCharInt(*str))
+            {
+                inteiro *= 10; // incrementa o número de algarismos e ordem de grandeza
+                inteiro += *str - 48;  // atribui o novo algarismo em sua casa atual
+                i++; // incrementa o indexador
+            }
+
+            inteiro *= sinal;
+
+            return inteiro; // resultado
+        }
+
+        //////////////////////////////
+
+    #pragma endregion
+
     #pragma region Matematica
+
+        //////////////////////////////
 
         // Sumário: Obtém a quantidade de algarismos presentes em um número
         // inteiro
@@ -260,8 +309,12 @@ int main (void) {
             return str;
         }
 
+        //////////////////////////////
+
     #pragma endregion
 
     //////////////////////////////
 
 #pragma endregion
+
+//////////////////////////////
