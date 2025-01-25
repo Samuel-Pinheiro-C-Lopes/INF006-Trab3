@@ -109,6 +109,15 @@
 
         //////////////////////////////
 
+        #pragma region Busca
+
+            No *buscarNoArv(Arvore *arv, int chave);
+            No *buscarNoSubarv(No *noAtual, int chave);
+
+        #pragma endregion
+
+        //////////////////////////////
+
         #pragma region String
 
             char* obterSubstr(char *str, char *separadores);
