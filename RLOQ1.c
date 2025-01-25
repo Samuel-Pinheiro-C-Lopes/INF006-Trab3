@@ -135,6 +135,8 @@
 
 int main (void) {
 
+    return 0;
+
 }
 
 #pragma region PRINCIPAL
@@ -147,62 +149,65 @@ int main (void) {
 
     #pragma region String
 
-            //////////////////////////////
+        //////////////////////////////
 
-            // Sumário: obtém a substring de início igual ao ponteiro de caracter
-            // passado e final fim da cadeia ou primeira ocorrência de um dos 
-            // separadores
-            // Parâmetros: <str: ponteiro para o início da string> e <separadores:
-            // string dos separadores, caracteres que finalizam a substring além do
-            // '\0'
-            // Retorna: ponteiro para a substring formada.
-            char* obterSubstr(char *str, char *separadores) {
-                static char substr[tam_max_substr];
-                char *idx = substr;
-                int i, j;
+        // Sumário: obtém a substring de início igual ao ponteiro de caracter
+        // passado e final fim da cadeia ou primeira ocorrência de um dos 
+        // separadores
+        // Parâmetros: <str: ponteiro para o início da string> e <separadores:
+        // string dos separadores, caracteres que finalizam a substring além do
+        // '\0'
+        // Retorna: ponteiro para a substring formada.
+        char* obterSubstr(char *str, char *separadores) 
+        {
+            static char substr[tam_max_substr];
+            char *idx = substr;
+            int i, j;
 
-                for(i = 0; str[i] != '\n'; i++) {
-                    for (j = 0; separadores[j] != '\0'; j++)
-                        if (separadores[j] == str[i])
-                            break;
+            for(i = 0; str[i] != '\n'; i++) 
+            {
+                for (j = 0; separadores[j] != '\0'; j++)
+                    if (separadores[j] == str[i])
+                        break;
 
-                    idx[i] = str[i];
-                }
-
-                return substr;
+                idx[i] = str[i];
             }
 
-            //////////////////////////////
+            return substr;
+        }
 
-            // Sumário: busca pela próxima ocorrência de certos alvos
-            // em uma string e retorna o seu ponteiro
-            // Parâmetros: <str: string alvo> <alvos: caracteres que finalizarão
-            // a busca>
-            // Retorna: <char *: ponteiro para a primeira ocorrência de um dos alvos>
-            char* proxOcorrencia(char *str, char *alvos) {
-                char *idx = str;
-                int i, j;
-                
-                // para cara char da entrada
-                for (i = 0; str[i] != '\0'; i++)
-                    // verifica por igualdade com algum alvo
-                    for (j = 0; alvos[j] != '\0'; j++)
-                        if (alvos[j] == str[i])
-                            break;    
+        //////////////////////////////
 
-                // retorna ponteiro da primeira ocorrência 
-                // de um dos alvos ou '\0'
-                return &idx[i]; 
-            }
+        // Sumário: busca pela próxima ocorrência de certos alvos
+        // em uma string e retorna o seu ponteiro
+        // Parâmetros: <str: string alvo> <alvos: caracteres que finalizarão
+        // a busca>
+        // Retorna: <char *: ponteiro para a primeira ocorrência de um dos alvos>
+        char* proxOcorrencia(char *str, char *alvos) 
+        {
+            char *idx = str;
+            int i, j;
+            
+            // para cara char da entrada
+            for (i = 0; str[i] != '\0'; i++)
+                // verifica por igualdade com algum alvo
+                for (j = 0; alvos[j] != '\0'; j++)
+                    if (alvos[j] == str[i])
+                        break;    
 
-            int checarCharInt(char c){
-                if (c > 47 && c < 58)
-                    return 1;
-                else 
-                    return 0;
-            }
+            // retorna ponteiro da primeira ocorrência 
+            // de um dos alvos ou '\0'
+            return &idx[i]; 
+        }
 
-            //////////////////////////////
+        int checarCharInt(char c){
+            if (c > 47 && c < 58)
+                return 1;
+            else 
+                return 0;
+        }
+
+        //////////////////////////////
 
     #pragma endregion
 
@@ -215,7 +220,8 @@ int main (void) {
         // Sumário: converte um texto para seu equivalente numérico inteiro
         // Parâmetros: <str: indexador da string a ser convertida>
         // Retorna: <int: numero resultante>
-        int convStrInt(char* str){
+        int convStrInt(char* str)
+        {
             // propriedades
             int inteiro = 0;
             int sinal = 1;
@@ -253,7 +259,8 @@ int main (void) {
         // inteiro
         // Parâmetros: <inteiro: número cujos algarismos devem ser contabilizados>
         // Retorna: <int: quantidade de algarismos>
-        int qntAlgsInt(int inteiro){
+        int qntAlgsInt(int inteiro)
+        {
             static int qntAlgs;
 
             if (inteiro == 0)
@@ -268,7 +275,8 @@ int main (void) {
         // Sumário: eleva um determinado número inteiro por um expoente também inteiro
         // Parâmetros: <inteiro: número a ser elevado, base> e <expoente>
         // Retorna: <int: resultado da exponencialização>
-        int expInt(int inteiro, int exp){
+        int expInt(int inteiro, int exp)
+        {
             int resultado = inteiro;
             if (exp == 0)
                 return 1; // todo número ^0 é 1
@@ -285,7 +293,8 @@ int main (void) {
         // com seu conteúdo
         // Parâmetros: <inteiro: número inteiro a ser lido>
         // Retorna: <char *: ponteiro para a cadeia resultante>
-        char* convIntStr(int inteiro){
+        char* convIntStr(int inteiro)
+        {
             static char str[tam_max_substr];
             char *idx = str;
             int numGrandezaAtual;
