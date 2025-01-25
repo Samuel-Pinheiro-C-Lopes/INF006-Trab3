@@ -14,26 +14,34 @@
 
     #pragma region Estruturas
 
+        typedef struct cbctGerLinha CbctLinha;
         typedef struct itemLista ItemLista;
         typedef struct no No;
         typedef struct lista Lista;
         typedef struct arvore Arvore;
-        typedef struct gerLinhas GerLinhas;
+        typedef struct linha Linha;
+
+        struct cbctGerLinha {
+            Linha *inicioLinha;
+            Linha *fimLinha;
+        };
 
         // sumário: gerência as estruturas de entrada e saída -
         // lista e árvore, respectivamente
         // Como o cabeçote de lista e a árvore tem ponteiro para
         // próximo, ele é capaz de armazenar as listas e árvores
         // correspondentes a cada linha
-        struct gerLinhas {
-            Arvore *inicioArvores;
-            Lista *inicioListas;
+        struct linha {
+            Linha *prox;
+            Arvore *arvore;
+            Lista *lista;
+            char linhaSaida[tam_max_linha];
         };
 
         // sumário: cabeçote que aponta para início da lista
         struct lista {
-            Lista *prox;
             ItemLista *inicio;
+            ItemLista *fim;
         };
 
         // sumário: lista para receber a sequência de inteiros 
@@ -48,12 +56,10 @@
         // níveis permitirão a contagem para a linha de saída.
         // Também armazena a linha de saída correspondente à árvore.
         struct arvore {
-            Arvore *prox;
             No *raiz;
             int max;
             int pred;
             int alt;
-            char linhaSaida[tam_max_linha];
         };
 
         // sumário: nó da árvore
@@ -62,6 +68,7 @@
             No *esquerda;
             No *mae;
             int valor;
+            int altura; // facilitar saída
         };
 
     #pragma endregion
@@ -75,7 +82,7 @@
         #pragma region Inicializar
 
             // ger
-            GerLinhas *inicializarGerLinhas();
+            Linha *inicializarLinha();
             // arvore
             Arvore *inicializarArvore();
             No *inicializarNo(int valor);
@@ -90,10 +97,10 @@
         #pragma region Adicionar
 
             // ger
-            void adicionarLista(GerLinhas *ger, Lista *lista);
-            void adicionarArvore(GerLinhas *ger, Arvore *arv);
+            void adicionarLinha(CbctLinha *cbct, Linha *novaLinha);
             // arvore
-            void adicionarNoArv(Arvore *arv, No *no);
+            void adicionarNoSubarv(No *noAtual, No *novoNo);
+            void adicionarNoArv(Arvore *arv, No *novoNo);
             // lista
             void adicionarItemLista(Lista *lista, ItemLista *item);
 
@@ -146,13 +153,20 @@ int main (void) {
     #pragma region Inicializar
 
             // ger
+            CbctLinha *inicializarCbctLinha() {
+                CbctLinha *novoCbct = (CbctLinha *) malloc(sizeof(CbctLinha));
+                novoCbct->fimLinha = novoCbct->inicioLinha = NULL;
+                return novoCbct;
+            }
+
             // Sumário: inicializa novo gerente de linhas
             // Parâmetros: <void>
             // Retorno: ponteiro para novo gerente
-            GerLinhas *inicializarGerLinhas() {
-                GerLinhas *novoGer = (GerLinhas *) malloc(sizeof(GerLinhas));
-                novoGer->inicioArvores = NULL;
-                novoGer->inicioListas = NULL;
+            Linha *inicializarLinha() {
+                Linha *novaLinha = (Linha *) malloc(sizeof(Linha));
+                novaLinha->arvore = NULL;
+                novaLinha->lista = NULL;
+                return novaLinha;
             }
 
             // arvore
@@ -162,8 +176,6 @@ int main (void) {
             Arvore *inicializarArvore() {
                 Arvore *novaArvore = (Arvore *) malloc(sizeof(Arvore));
                 novaArvore->raiz = NULL;
-                novaArvore->prox = NULL;
-                novaArvore->linhaSaida[0] = '\0';
                 novaArvore->max = 0;
                 novaArvore->alt = 0;
                 novaArvore->pred = 0;
@@ -175,6 +187,7 @@ int main (void) {
             // Retorno: ponteiro para novo nó
             No *inicializarNo(int valor) {
                 No *novoNo = (No *) malloc(sizeof(No));
+                novoNo->altura = 0;
                 novoNo->valor = valor;
                 novoNo->direita = NULL;
                 novoNo->esquerda = NULL;
@@ -189,7 +202,6 @@ int main (void) {
             Lista *inicializarLista() {
                 Lista *novaLista = (Lista *) malloc(sizeof(Lista));
                 novaLista->inicio = NULL;
-                novaLista->prox = NULL;
                 return novaLista;
             }
 
@@ -209,24 +221,105 @@ int main (void) {
 
     #pragma region Adicionar
 
-            // ger
-            void adicionarLista(GerLinhas *ger, Lista *lista) {
-                return;
+        /*
+        // ger
+        // Sumário: Adiciona uma lista de itens ao gerente de linhas
+        // Parâmetros: <ger: gerente a ter lista adicionada> e <lista: 
+        // lista a ser adicionada>
+        // Retorna: <void>
+        void adicionarLista(Linha *linha, Lista *lista) 
+        {
+            if (ger->inicioListas == NULL)
+                ger->inicioListas = ger->fimListas = lista;
+            else 
+            {
+                ger->fimListas->prox = lista;
+                ger->fimListas = lista;
             }
+        }
+        */
 
-            void adicionarArvore(GerLinhas *ger, Arvore *arv) {
-                return;
+        /*
+        // Sumário: Adiciona uma árvore ao gerente de linhas
+        // Parâmetros: <ger: gerente a ter a árvore adicionada> e <arv:
+        // árvore a ser adicionada>
+        // Retorna: <void>
+        void adicionarArvore(GerLinhas *ger, Arvore *arv) 
+        {
+            if (ger->inicioArvores == NULL)
+                ger->inicioArvores = ger->fimArvores = arv;
+            else 
+            {
+                ger->fimArvores->prox = arv;
+                ger->fimArvores = arv;
             }
+        }
+        */
 
-            // arvore
-            void adicionarNoArv(Arvore *arv, No *no) {
-                return;
+        void adicionarLinha(CbctLinha *cbct, Linha *novaLinha)
+        {
+            if (cbct->inicioLinha == NULL)
+                cbct->inicioLinha = cbct->fimLinha = novaLinha;
+            else 
+            {
+                cbct->fimLinha->prox = novaLinha;
+                cbct->fimLinha = novaLinha;
             }
+        }
 
-            // lista
-            void adicionarItemLista(Lista *lista, ItemLista *item) {
-                return;
+        // arvore
+        // Sumário: Adiciona um novo nó à árvore
+        // Parâmetros: <arv: árvore na qual ocorrerá a inserção> e 
+        // <novoNo: nó a ser inserido>
+        // Retorna: <void>
+        void adicionarNoArv(Arvore *arv, No *novoNo) 
+        {
+            if (arv->raiz == NULL)
+                arv->raiz = novoNo;
+            else 
+                adicionarNoSubarv(arv->raiz, novoNo);
+        }
+
+        // Sumário: Recursão auxiliar para adicionar nó na subárvore
+        // Parâmetros: <No: no atual da subárvore> e <novoNo: nó a 
+        // ser inserido>
+        // Retorna: <void>
+        void adicionarNoSubarv(No *noAtual, No *novoNo) 
+        {
+            novoNo->mae = noAtual;
+            novoNo->altura += 1;
+            
+            if (noAtual->valor > novoNo->valor) 
+            {
+                if (noAtual->esquerda != NULL)
+                    adicionarNoSubarv(noAtual->esquerda, novoNo);
+                else
+                    noAtual->esquerda = novoNo;
             }
+            else 
+            {
+                if (noAtual->direita != NULL)
+                    adicionarNoSubarv(noAtual->direita, novoNo);
+                else 
+                    noAtual->direita = novoNo;
+            }
+        }
+
+        // lista
+        // Sumário: adiciona um item à lista
+        // Parâmetros: <lista: lista na qual ocorrerá a inserção> e 
+        // <item: item a ser inserido>
+        // Retorna: <void>
+        void adicionarItemLista(Lista *lista, ItemLista *item) 
+        {
+            if (lista->inicio == NULL)
+                lista->inicio = lista->fim = item;
+            else 
+            {
+                lista->fim->prox = item;
+                lista->fim = item;
+            }
+        }
 
     #pragma endregion
 
