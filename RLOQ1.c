@@ -31,7 +31,7 @@
         };
 
         // sumário: cabeçote que aponta para início da lista
-        struct Lista {
+        struct lista {
             Lista *prox;
             ItemLista *inicio;
         };
@@ -140,6 +140,97 @@ int main (void) {
 }
 
 #pragma region PRINCIPAL
+
+//////////////////////////////
+
+    #pragma region Inicializar
+
+            // ger
+            // Sumário: inicializa novo gerente de linhas
+            // Parâmetros: <void>
+            // Retorno: ponteiro para novo gerente
+            GerLinhas *inicializarGerLinhas() {
+                GerLinhas *novoGer = (GerLinhas *) malloc(sizeof(GerLinhas));
+                novoGer->inicioArvores = NULL;
+                novoGer->inicioListas = NULL;
+            }
+
+            // arvore
+            // Sumário: inicializa nova árvore
+            // Parâmetros: <void>
+            // Retorno: ponteiro para nova árvore
+            Arvore *inicializarArvore() {
+                Arvore *novaArvore = (Arvore *) malloc(sizeof(Arvore));
+                novaArvore->raiz = NULL;
+                novaArvore->prox = NULL;
+                novaArvore->linhaSaida[0] = '\0';
+                novaArvore->max = 0;
+                novaArvore->alt = 0;
+                novaArvore->pred = 0;
+                return novaArvore;
+            }
+
+            // Sumário: inicializa novo nó
+            // Parâmetros: <valor: valor do novo nó>
+            // Retorno: ponteiro para novo nó
+            No *inicializarNo(int valor) {
+                No *novoNo = (No *) malloc(sizeof(No));
+                novoNo->valor = valor;
+                novoNo->direita = NULL;
+                novoNo->esquerda = NULL;
+                novoNo->mae = NULL;
+                return novoNo;
+            }
+
+            // lista
+            // Sumário: inicializa nova lista
+            // Parâmetros: <void>
+            // Retorno: ponteiro para nova lista
+            Lista *inicializarLista() {
+                Lista *novaLista = (Lista *) malloc(sizeof(Lista));
+                novaLista->inicio = NULL;
+                novaLista->prox = NULL;
+                return novaLista;
+            }
+
+            // Sumário: inicializa novo item de lista
+            // Parâmetros: <valor: valor do item>
+            // Retorno: ponteiro para novo item
+            ItemLista *inicializarItemLista(int valor) {
+                ItemLista *novoItem = (ItemLista *) malloc(sizeof(ItemLista));
+                novoItem->valor = valor;
+                novoItem->prox = NULL;
+                return novoItem;
+            }
+
+    #pragma endregion
+
+    //////////////////////////////
+
+    #pragma region Adicionar
+
+            // ger
+            void adicionarLista(GerLinhas *ger, Lista *lista) {
+                return;
+            }
+
+            void adicionarArvore(GerLinhas *ger, Arvore *arv) {
+                return;
+            }
+
+            // arvore
+            void adicionarNoArv(Arvore *arv, No *no) {
+                return;
+            }
+
+            // lista
+            void adicionarItemLista(Lista *lista, ItemLista *item) {
+                return;
+            }
+
+    #pragma endregion
+
+//////////////////////////////
 
 #pragma endregion
 
