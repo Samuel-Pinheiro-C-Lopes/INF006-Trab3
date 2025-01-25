@@ -69,6 +69,7 @@
             No *mae;
             int valor;
             int altura; // facilitar saída
+            int checado; // facilitar saída
         };
 
     #pragma endregion
@@ -188,6 +189,7 @@ int main (void) {
             No *inicializarNo(int valor) {
                 No *novoNo = (No *) malloc(sizeof(No));
                 novoNo->altura = 0;
+                novoNo->checado = 0;
                 novoNo->valor = valor;
                 novoNo->direita = NULL;
                 novoNo->esquerda = NULL;
@@ -322,6 +324,41 @@ int main (void) {
         }
 
     #pragma endregion
+
+    //////////////////////////////
+
+    #pragma region Buscar
+
+        // Sumário: Busca por um nó em uma árvore, o checa e retorna se encontrar
+        // Parâmetros: <arv: árvore a ter um nó buscado> e <chave: valor de
+        // busca>
+        // Retorna: <No *: ponteiro para o nó ou nulo se não houver>
+        No *buscarNoArv(Arvore *arv, int chave)
+        {
+            No *noAlvo = buscarNoSubarv(arv->raiz, chave);
+
+            if (noAlvo != NULL)
+                noAlvo->checado = 1;
+            
+            return noAlvo;
+        }
+
+        // Sumário: função auxiliar recursiva para realizar a busca do nó de chave
+        // equivalente à passada, retornando o Nó ou NULL
+        // Parâmetros: <noAtual: nó atual da recursão, representa raiz da
+        // subárvore avaliada> e <chave: valor de
+        // busca>
+        // Retorna: <No *: ponteiro para o nó ou nulo se não houver>
+        No *buscarNoSubarv(No *noAtual, int chave)
+        {
+            if (noAtual == NULL || (noAtual->valor == chave && noAtual->checado == 0)) return noAtual;
+            else if (noAtual->valor >= chave) return buscarNoSubarv(noAtual->esquerda, chave);
+            else if (noAtual-> valor < chave) return buscarNoSubarv(noAtual->direita, chave);
+        }
+
+    #pragma endregion
+
+    //////////////////////////////
 
 //////////////////////////////
 
