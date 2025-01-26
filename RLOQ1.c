@@ -139,6 +139,7 @@
             void lerLista(Lista *lista, char *idxStr);
             void lerTodasLinhas(CbctLinha *cbctLinha, FILE *entrada);
             // auxiliares
+            int preencherStr(char *cadeia, char *conteudo);
             char* obterSubstr(char *str, char *separadores);
             int proxOcorrencia(char *str, char *alvos);
             int checarCharInt(char c);
@@ -538,6 +539,26 @@ int main (void) {
 
         //////////////////////////////
 
+        // Sumário: Preenche a cadeia alvo com o conteúdo
+        // até o fim do conteúdo.
+        // Não checa pelo final da cadeia alvo, podendo tentar atribuir memória não alocada
+        // para a cadeia
+        // Parâmetros: <cadeia: vetor de caracteres alvo a ser preenchido> e <conteudo:
+        // vetor de caracteres que deve preencher o alvo>
+        // Retorna: <int: quantos caracteres foram preenchidos>
+        int preencherStr(char *cadeia, char *conteudo)
+        {
+            int cont = 0;
+
+            while (*(conteudo) != '\0')
+            {
+                *(cadeia++) = *(conteudo++);
+                cont++;
+            }
+
+            return cont;
+        }
+
         // Sumário: obtém a substring de início igual ao ponteiro de caracter
         // passado e final fim da cadeia ou primeira ocorrência de um dos 
         // separadores
@@ -590,6 +611,9 @@ int main (void) {
             fim: return i; 
         }
 
+        // Sumário: checa se o char recebido é um número representado pela tabela ASCII
+        // Parâmetros: <c: caracter avaliado>
+        // Retorna: <int: 1 para verdadeiro, 0 para falso>
         int checarCharInt(char c){
             if (c > 47 && c < 58)
                 return 1;
