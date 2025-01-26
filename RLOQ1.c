@@ -84,7 +84,8 @@
         #pragma region Inicializar
 
             // ger
-            Linha *inicializarLinha();
+            CbctLinha *inicializarCbctLinha() ;
+            Linha *inicializarLinha(Lista *lista, Arvore *arv);
             // arvore
             Arvore *inicializarArvore();
             No *inicializarNo(int valor);
@@ -123,6 +124,7 @@
 
             // principal
             void lerLista(Lista *lista, char *idxStr);
+            void lerTodasLinhas(CbctLinha *cbctLinha, FILE *entrada);
             // auxiliares
             char* obterSubstr(char *str, char *separadores);
             int proxOcorrencia(char *str, char *alvos);
@@ -157,6 +159,15 @@
 
 int main (void) {
 
+
+    FILE *entrada = fopen("L2Q1.in", "r");
+    CbctLinha *cbctLinha = inicializarCbctLinha();
+
+    if (entrada == NULL)
+        printf("\nERRO, entrada inválida, arquivo inexistente");
+    else 
+        lerTodasLinhas(cbctLinha, entrada);
+
     /*
     Lista *lista = inicializarLista();
 
@@ -187,10 +198,10 @@ int main (void) {
             // Sumário: inicializa novo gerente de linhas
             // Parâmetros: <void>
             // Retorno: ponteiro para novo gerente
-            Linha *inicializarLinha() {
+            Linha *inicializarLinha(Lista *lista, Arvore *arv) {
                 Linha *novaLinha = (Linha *) malloc(sizeof(Linha));
-                novaLinha->arvore = NULL;
-                novaLinha->lista = NULL;
+                novaLinha->arvore = arv;
+                novaLinha->lista = lista;
                 return novaLinha;
             }
 
@@ -385,6 +396,21 @@ int main (void) {
     //////////////////////////////
 
     #pragma region String
+
+        // Sumário: Lê todas as linhas em formato de lista presentes em um arquivo de texto
+        // Parâmetros: <cbctLinha: cbct de linha a  ser escrita> e <entrada: arquivo a ser
+        // lido>
+        // Retorna: <void>
+        void lerTodasLinhas(CbctLinha *cbctLinha, FILE *entrada)
+        {
+            static char linhaStr[tam_max_linha];
+
+            while (fgets(linhaStr, tam_max_linha, entrada) != NULL) {
+                // adiciona ao cbct       // nova linha    // nova lista       // nova árvore
+                adicionarLinha(cbctLinha, inicializarLinha(inicializarLista(), inicializarArvore()));
+                lerLista(cbctLinha->fimLinha->lista, linhaStr);
+            }
+        }
 
         // Sumário: Lê uma lista de uma entrada de texto, cujos números inteiros devem ser
         // espaçados em 1 entre si Navega pelos espaços.
