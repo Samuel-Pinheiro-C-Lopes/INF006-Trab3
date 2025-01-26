@@ -58,8 +58,8 @@
         // Também armazena a linha de saída correspondente à árvore.
         struct arvore {
             No *raiz;
-            int max;
-            int pred;
+            No *max;
+            No *pred;
             int alt;
         };
 
@@ -181,6 +181,12 @@ int main (void) {
     else 
         lerTodasLinhas(cbctLinha, entrada);
 
+    for (Linha *linhaAtual = cbctLinha->inicioLinha; linhaAtual != NULL; linhaAtual = linhaAtual->prox)
+    {
+        atribuirListaArv(linhaAtual->lista, linhaAtual->arvore);
+        atribuirMaxAltPredArv(linhaAtual->arvore);
+    }
+
     /*
     Lista *lista = inicializarLista();
 
@@ -225,9 +231,9 @@ int main (void) {
             Arvore *inicializarArvore() {
                 Arvore *novaArvore = (Arvore *) malloc(sizeof(Arvore));
                 novaArvore->raiz = NULL;
-                novaArvore->max = 0;
+                novaArvore->max = NULL;
                 novaArvore->alt = 0;
-                novaArvore->pred = 0;
+                novaArvore->pred = NULL;
                 return novaArvore;
             }
 
@@ -392,11 +398,9 @@ int main (void) {
         // Retorna: <void>
         void atribuirMaxAltPredArv(Arvore *arv)
         {
-            No *noMax = buscarMaxArv(arv);
-            arv->max = noMax->valor;
-            arv->alt = noMax->altura;
-            No *noPred = buscarPredArv(arv, noMax);
-            arv->pred = noPred == NULL ? noPred : noPred->valor;
+            arv->max = buscarMaxArv(arv);;
+            arv->alt = arv->max != NULL ? arv->max->altura : -1;
+            arv->pred = buscarPredArv(arv, arv->max);
         }
 
     #pragma endregion
