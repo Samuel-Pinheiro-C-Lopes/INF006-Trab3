@@ -467,7 +467,7 @@ int main (void) {
             if (arv->raiz == NULL || arv->raiz == noMax)
                 return NULL;
             else 
-                return buscarMaxSubarv(arv->raiz);
+                return buscarPredSubarv(arv->raiz, noMax);
         }
 
         // Sumário: busca o nó de segundo maior valor na subárvore - nó atual != NULL
