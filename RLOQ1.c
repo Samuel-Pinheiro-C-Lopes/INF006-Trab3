@@ -109,6 +109,8 @@
 
         #pragma endregion
 
+        //////////////////////////////
+
         #pragma region Atribuir
 
         void atribuirListaArv(Lista *lista, Arvore *arv);
@@ -367,6 +369,34 @@ int main (void) {
                 lista->fim->prox = item;
                 lista->fim = item;
             }
+        }
+
+    #pragma endregion
+
+    //////////////////////////////
+
+    #pragma region Atribuir
+
+        // Sumário: atribui uma lista de valores a uma árvore de busca binária
+        // Parâmetros: <lista: lista a ser lida> e <arv: árvore a ser escrita>
+        // Retorna: <void>
+        void atribuirListaArv(Lista *lista, Arvore *arv)
+        {
+            for (ItemLista *itemAtual = lista->inicio; itemAtual != NULL; itemAtual = itemAtual->prox)
+                adicionarNoArv(arv, inicializarNo(itemAtual->valor));
+        }
+
+        // Sumário: Atribui os campos Max, Alt e Pred de uma árvore, considerando
+        // que ela já está preenchida
+        // Parâmetros: <arv: árvore a ser atrubuída>
+        // Retorna: <void>
+        void atribuirMaxAltPredArv(Arvore *arv)
+        {
+            No *noMax = buscarMaxArv(arv);
+            arv->max = noMax->valor;
+            arv->alt = noMax->altura;
+            No *noPred = buscarPredArv(arv, noMax);
+            arv->pred = noPred == NULL ? noPred : noPred->valor;
         }
 
     #pragma endregion
