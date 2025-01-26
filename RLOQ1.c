@@ -109,12 +109,23 @@
 
         #pragma endregion
 
+        #pragma region Atribuir
+
+        void atribuirListaArv(Lista *lista, Arvore *arv);
+        void atribuirMaxAltPredArv(Arvore *arv);
+
+        #pragma endregion
+
         //////////////////////////////
 
         #pragma region Busca
 
             No *buscarNoArv(Arvore *arv, int chave);
             No *buscarNoSubarv(No *noAtual, int chave);
+            No *buscarMaxArv(Arvore *arv);
+            No *buscarMaxSubarv(No *noAtual);
+            No *buscarPredArv(Arvore *arv, No *noMax);
+            No *buscarPredSubarv(No *noAtual, No *noMax);
 
         #pragma endregion
 
@@ -389,6 +400,50 @@ int main (void) {
             if (noAtual == NULL || (noAtual->valor == chave && noAtual->checado == 0)) return noAtual;
             else if (noAtual->valor >= chave) return buscarNoSubarv(noAtual->esquerda, chave);
             else if (noAtual-> valor < chave) return buscarNoSubarv(noAtual->direita, chave);
+        }
+
+        // Sumário: busca o nó de maior valor na árvore
+        // Parâmetros: <arv: árvore>
+        // Retorna: <No *: ponteiro para o nó encontrado>
+        No *buscarMaxArv(Arvore *arv)
+        {
+            if (arv->raiz == NULL)
+                return NULL;
+            else 
+                return buscarMaxSubarv(arv->raiz);
+        }
+
+
+        // Sumário: busca o nó de maior valor na subárvore - nó atual != NULL
+        // Parâmetros: <noAtual: nó que representa subárvore>
+        // Retorna: <No *: ponteiro para o nó encontrado>
+        No *buscarMaxSubarv(No *noAtual) 
+        {
+            if (noAtual->direita == NULL) return noAtual;
+            else return buscarMaxSubarv(noAtual->direita);
+        }
+
+        
+        // Sumário: busca o nó de segundo maior valor na árvore ou nulo
+        // se não houver
+        // Parâmetros: <arv: árvore> e <noMax: nó de maior valor>
+        // Retorna: <No *: ponteiro para o nó encontrado>
+        No *buscarPredArv(Arvore *arv, No *noMax)
+        {
+            if (arv->raiz == NULL || arv->raiz == noMax)
+                return NULL;
+            else 
+                return buscarMaxSubarv(arv->raiz);
+        }
+
+        // Sumário: busca o nó de segundo maior valor na subárvore - nó atual != NULL
+        // Parâmetros: <noMax: nó que representa a subárvore>
+        // Retorna: <No *: ponteiro para o nó encontrado>
+        No *buscarPredSubarv(No *noAtual, No *noMax)
+        {
+            if (noAtual->direita != noMax) return buscarPredSubarv(noAtual->direita, noMax);
+            else if (noAtual->direita->esquerda != NULL) return noAtual->direita->esquerda;
+            else return noAtual;
         }
 
     #pragma endregion
