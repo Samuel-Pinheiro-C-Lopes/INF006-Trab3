@@ -5,6 +5,7 @@
 
 #define tam_max_linha (1000)
 #define tam_max_substr (255)
+#define FIM_LINHA (-1)
 
 //////////////////////////////
 
@@ -120,9 +121,13 @@
 
         #pragma region String
 
+            // principal
+            void lerLista(Lista *lista, char *idxStr);
+            // auxiliares
             char* obterSubstr(char *str, char *separadores);
-            char* proxOcorrencia(char *str, char *alvos);
+            int proxOcorrencia(char *str, char *alvos);
             int checarCharInt(char c);
+            char proxCharStr(char *cadeia, char *separadores, int intervalo);
 
         #pragma endregion
 
@@ -152,6 +157,16 @@
 
 int main (void) {
 
+    /*
+    Lista *lista = inicializarLista();
+
+    char str[100] = "-5 -8 -1 4 6 9 11 15";
+
+    lerLista(lista, str);
+
+    for (ItemLista *atual = lista->inicio; atual != NULL; atual = atual->prox)
+        printf("%d->", atual->valor);
+    */
     return 0;
 
 }
@@ -369,6 +384,33 @@ int main (void) {
 
     //////////////////////////////
 
+    #pragma region String
+
+        // Sumário: Lê uma lista de uma entrada de texto, cujos números inteiros devem ser
+        // espaçados em 1 entre si Navega pelos espaços.
+        // Parâmetros: <lista: lista a ser preenchida> e <idxStr: indexador atual
+        // do texto de entrada>
+        // Retorno: <void>
+        void lerLista(Lista *lista, char *idxStr)
+        { 
+            while (idxStr[0] != '\0')
+            {
+                switch(proxCharStr(idxStr, "\n", 1))
+                {
+                    case ('\0'): // fim string
+                    case ('\n'): break; // pula linha
+                            // insere                  // novo item        // converte // obtém substring
+                    default: adicionarItemLista(lista, inicializarItemLista(convStrInt(obterSubstr(idxStr, " "))));
+                }
+                idxStr += sizeof(char) * proxOcorrencia(idxStr, " ");
+                idxStr += sizeof(char) * proxOcorrencia(idxStr, "-123456789");
+            }
+        }
+
+    #pragma endregion
+
+    //////////////////////////////
+
 //////////////////////////////
 
 #pragma endregion
@@ -391,29 +433,32 @@ int main (void) {
         char* obterSubstr(char *str, char *separadores) 
         {
             static char substr[tam_max_substr];
-            char *idx = substr;
             int i, j;
 
-            for(i = 0; str[i] != '\n'; i++) 
+            for(i = 0; str[i] != '\0' && i < tam_max_substr - 1; i++) 
             {
                 for (j = 0; separadores[j] != '\0'; j++)
                     if (separadores[j] == str[i])
-                        break;
+                        goto fim;
 
-                idx[i] = str[i];
+                substr[i] = str[i];
             }
 
-            return substr;
+            fim: 
+            {
+                substr[i] = '\0';
+                return substr;
+            }
         }
 
         //////////////////////////////
 
         // Sumário: busca pela próxima ocorrência de certos alvos
-        // em uma string e retorna o seu ponteiro
+        // em uma string e retorna quantidade de passos até chegar nela
         // Parâmetros: <str: string alvo> <alvos: caracteres que finalizarão
         // a busca>
-        // Retorna: <char *: ponteiro para a primeira ocorrência de um dos alvos>
-        char* proxOcorrencia(char *str, char *alvos) 
+        // Retorna: <int: quantidade de avanços até a primeira ocorrência de um dos alvos>
+        int proxOcorrencia(char *str, char *alvos) 
         {
             char *idx = str;
             int i, j;
@@ -423,11 +468,11 @@ int main (void) {
                 // verifica por igualdade com algum alvo
                 for (j = 0; alvos[j] != '\0'; j++)
                     if (alvos[j] == str[i])
-                        break;    
+                        goto fim;
 
             // retorna ponteiro da primeira ocorrência 
             // de um dos alvos ou '\0'
-            return &idx[i]; 
+            fim: return i; 
         }
 
         int checarCharInt(char c){
@@ -435,6 +480,29 @@ int main (void) {
                 return 1;
             else 
                 return 0;
+        }
+
+        // Sumário: busca em uma cadeia a primeira ocorrência de um ou mais 
+        // caracteres de separação em um intervalo, retornando essa ocorrência
+        // Parâmetros: <cadeia: cadeia de caracteres de entrada>, <separadores: caracteres de busca> e
+        // <intervalo: quantos caracteres contando com o atual devem ser lidos a partir do indexador>
+        // Returna: <char: caracter da ocorrência encontrada> 
+        char proxCharStr(char *cadeia, char *separadores, int intervalo)
+        {
+            // contadores
+            int i, k;
+
+            // busca a próxima ocorrência de um dos separadores nos <intervalo> primeiros
+            // caracteres
+            for (i = 0; cadeia[i] != '\0' && i < intervalo; i++)
+                for (k = i; separadores[k] != '\0'; k++)
+                    if (cadeia[i] == separadores[k])
+                        goto fim; // finaliza
+
+            // retorna primeira ocorrência entre os separadores,
+            // o char na posição final do intervalo ou '\0' se chegar
+            //  no final da linha
+            fim: return cadeia[i];
         }
 
         //////////////////////////////
@@ -458,23 +526,52 @@ int main (void) {
             int i = 0;
 
             // se for negativo
-            if (str[i] == '-')
+            if (str[0] == '-')
             {
                 sinal = -1; 
-                i++;
+                str += sizeof(char);
             }
 
             // enquanto  não encontrar o final da linha
-            while (checarCharInt(*str))
+            while (checarCharInt((str[0])))
             {
                 inteiro *= 10; // incrementa o número de algarismos e ordem de grandeza
                 inteiro += *str - 48;  // atribui o novo algarismo em sua casa atual
-                i++; // incrementa o indexador
+                str += sizeof(char); // incrementa o indexador
             }
 
             inteiro *= sinal;
 
             return inteiro; // resultado
+        }
+
+        // Sumário: Converte um inteiro para uma cadeia de caracteres
+        // com seu conteúdo
+        // Parâmetros: <inteiro: número inteiro a ser lido>
+        // Retorna: <char *: ponteiro para a cadeia resultante>
+        char* convIntStr(int inteiro)
+        {
+            static char str[tam_max_substr];
+            char *idx = str;
+            int numGrandezaAtual;
+
+            if (inteiro < 0)
+            {
+                *(idx) = '-';
+                inteiro *= -1;
+                idx += sizeof(char);
+            }
+
+            for (int numAlgs = qntAlgsInt(inteiro); numAlgs > 0; numAlgs--)
+            {
+                numGrandezaAtual = inteiro / (expInt(10, numAlgs - 1));
+                *(idx) = numGrandezaAtual + 48;
+                inteiro -= numGrandezaAtual * expInt(10, numAlgs - 1);
+                idx += sizeof(char);
+            }
+            *(idx) = '\0';
+
+            return str;
         }
 
         //////////////////////////////
@@ -517,35 +614,6 @@ int main (void) {
                     resultado *= inteiro;
 
             return resultado;
-        }
-
-        // Sumário: Converte um inteiro para uma cadeia de caracteres
-        // com seu conteúdo
-        // Parâmetros: <inteiro: número inteiro a ser lido>
-        // Retorna: <char *: ponteiro para a cadeia resultante>
-        char* convIntStr(int inteiro)
-        {
-            static char str[tam_max_substr];
-            char *idx = str;
-            int numGrandezaAtual;
-
-            if (inteiro < 0)
-            {
-                *(idx) = '-';
-                inteiro *= -1;
-                idx += sizeof(char);
-            }
-
-            for (int numAlgs = qntAlgsInt(inteiro); numAlgs > 0; numAlgs--)
-            {
-                numGrandezaAtual = inteiro / (expInt(10, numAlgs - 1));
-                *(idx) = numGrandezaAtual + 48;
-                inteiro -= numGrandezaAtual * expInt(10, numAlgs - 1);
-                idx += sizeof(char);
-            }
-            *(idx) = '\0';
-
-            return str;
         }
 
         //////////////////////////////
