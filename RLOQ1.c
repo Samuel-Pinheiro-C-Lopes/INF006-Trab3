@@ -561,6 +561,7 @@
             idx += sizeof(char) * preencherStr(idx, " alt ");
             idx += sizeof(char) * preencherStr(idx, convIntStr(linha->arvore->alt));
             idx += sizeof(char) * preencherStr(idx, " pred ");
+            
             if (linha->arvore->pred != NULL)
                 idx += sizeof(char) * preencherStr(idx, convIntStr(linha->arvore->pred->valor));
             else 
