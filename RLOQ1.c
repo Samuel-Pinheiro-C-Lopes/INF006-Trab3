@@ -113,6 +113,7 @@
 
         #pragma region Atribuir
 
+        void atribuirCbctLinha(CbctLinha *linha);
         void atribuirListaArv(Lista *lista, Arvore *arv);
         void atribuirMaxAltPredArv(Arvore *arv);
         void atribuirSaidaLinha(Linha *linha);
@@ -139,6 +140,7 @@
             // principal
             void lerLista(Lista *lista, char *idxStr);
             void lerTodasLinhas(CbctLinha *cbctLinha, FILE *entrada);
+            void escreverSaida(CbctLinha *cbctLinha,FILE *saida);
             char *escreverSaidaLinha(Linha *linha);
             // auxiliares
             int preencherStr(char *cadeia, char *conteudo);
@@ -175,38 +177,29 @@
 
 int main (void) {
 
-
-    FILE *entrada = fopen("L2Q1.in", "r");
     CbctLinha *cbctLinha = inicializarCbctLinha();
+    FILE *entrada = fopen("L2Q1.in", "r");
+    FILE *saida = fopen("L2Q1.out", "w");
 
     if (entrada == NULL)
-        printf("\nERRO, entrada inválida, arquivo inexistente");
-    else 
-        lerTodasLinhas(cbctLinha, entrada);
-
-    for (Linha *linhaAtual = cbctLinha->inicioLinha; linhaAtual != NULL; linhaAtual = linhaAtual->prox)
     {
-        atribuirListaArv(linhaAtual->lista, linhaAtual->arvore);
-        atribuirMaxAltPredArv(linhaAtual->arvore);
-        atribuirSaidaLinha(linhaAtual);
+        printf("Falha ao ler ou entrada\n");
+        return EXIT_FAILURE;    
     }
 
-    for (Linha *linhaAtual = cbctLinha->inicioLinha; linhaAtual != NULL; linhaAtual = linhaAtual->prox)
+    if (saida == NULL)
     {
-        printf("%s\n", linhaAtual->linhaSaida);
+        printf("Falha ao designar arquivo de saída\n");
+        return EXIT_FAILURE;
     }
-    /*
-    Lista *lista = inicializarLista();
 
-    char str[100] = "-5 -8 -1 4 6 9 11 15";
+    lerTodasLinhas(cbctLinha, entrada);
 
-    lerLista(lista, str);
+    atribuirCbctLinha(cbctLinha);
 
-    for (ItemLista *atual = lista->inicio; atual != NULL; atual = atual->prox)
-        printf("%d->", atual->valor);
-    */
-    return 0;
+    escreverSaida(cbctLinha, saida);
 
+    return EXIT_SUCCESS;
 }
 
 #pragma region PRINCIPAL
@@ -390,6 +383,20 @@ int main (void) {
     //////////////////////////////
 
     #pragma region Atribuir
+
+        // Sumário: realiza todas as atribuições necessárias para cada linha
+        // presente no cabeçote, considerando que as listas de cada linha foram lidas
+        // Parâmetros: <cbctLinha: cabeçote cujas linhas serão atribuídas>
+        // Retorna: <void>
+        void atribuirCbctLinha(CbctLinha *cbctLinha) 
+        {
+            for (Linha *linhaAtual = cbctLinha->inicioLinha; linhaAtual != NULL; linhaAtual = linhaAtual->prox)
+            {
+                atribuirListaArv(linhaAtual->lista, linhaAtual->arvore);
+                atribuirMaxAltPredArv(linhaAtual->arvore);
+                atribuirSaidaLinha(linhaAtual);
+            }
+        }
     
         // Sumário: designa a string correspondente a saída esperada
         // por essa linha com base na árvore e lista correspondente
@@ -506,6 +513,12 @@ int main (void) {
     //////////////////////////////
 
     #pragma region String
+
+        void escreverSaida(CbctLinha *cbctLinha, FILE *saida)
+        {
+            for (Linha *linhaAtual = cbctLinha->inicioLinha; linhaAtual != NULL; linhaAtual = linhaAtual->prox)
+                fprintf(saida, "%s", linhaAtual->linhaSaida);
+        }
 
         // Sumário: escreve um texto de saída baseado nos campos preenchidos
         // da linha
