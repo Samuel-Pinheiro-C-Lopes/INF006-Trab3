@@ -156,7 +156,10 @@
         //////////////////////////////
 
         #pragma region Matematica
-
+            // principal
+            int diferencaSomaNosSubarv(No *subarv);
+            int somaNosSubarv(No *subarv);
+            // auxiliares
             int expInt(int inteiro, int exp);
             int qntAlgsInt(int inteiro);
 
@@ -332,7 +335,7 @@
         {
             if (arv->raiz == NULL)
                 arv->raiz = novoNo;
-            else 
+            else if (buscarNoArv(arv, novoNo->valor) == NULL) // se ainda não houver
                 adicionarNoSubarv(arv->raiz, novoNo);
         }
 
@@ -520,6 +523,45 @@
                 idxStr += sizeof(char) * proxOcorrencia(idxStr, " ");
                 idxStr += sizeof(char) * proxOcorrencia(idxStr, "-123456789");
             }
+        }
+
+    #pragma endregion
+
+    //////////////////////////////
+
+    #pragma region Matemática
+
+        // Sumário: calcula a diferença da soma dos valores dos nós á direita pelos
+        // da esquerda de uma subárvore
+        // Parâmetros: <subarv: subárvore alvo dos cálculos>
+        // Retorna: <diferença entre a soma da direita com a da esquerda>
+        int diferencaSomaNosSubarv(No *subarv)
+        {
+            int somaNosDireita;
+            int somaNosEsquerda;
+
+            if (subarv->esquerda == NULL) somaNosEsquerda = 0;
+            else somaNosEsquerda = somaNosSubarv(subarv->esquerda);
+
+            if (subarv->direita == NULL) somaNosDireita = 0;
+            else somaNosDireita = somaNosSubarv(subarv->direita);
+
+            return somaNosDireita - somaNosEsquerda;
+        }
+
+        // Sumário: calcula o total de valores presentes a partir de um nó 
+        // somando todos á sua esquerda, direita com o seu próprio
+        // Parâmetros: <subarv: subárvore alvo do cálculo>
+        // Retorna: <int: soma>
+        int somaNosSubarv(No *subarv)
+        {
+            int valor = subarv->valor;
+            if (subarv->direita != NULL)
+                valor += somaNosSubarv(subarv->direita);
+            if (subarv->esquerda != NULL)
+                valor += somaNosSubarv(subarv->esquerda);
+
+            return valor;
         }
 
     #pragma endregion
