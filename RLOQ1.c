@@ -113,10 +113,13 @@
 
         #pragma region Atribuir
 
-        void atribuirCbctLinha(CbctLinha *linha);
-        void atribuirListaArv(Lista *lista, Arvore *arv);
-        void atribuirMaxAltPredArv(Arvore *arv);
-        void atribuirSaidaLinha(Linha *linha);
+            // linha
+            void atribuirCbctLinha(CbctLinha *linha);
+            void atribuirSaidaLinha(Linha *linha);
+            // árvore
+            void atribuirListaArv(Lista *lista, Arvore *arv);
+            void atribuirMaxAltPredArv(Arvore *arv);
+            void atribuirSaidaLinha(Linha *linha);
 
         #pragma endregion
 
@@ -175,6 +178,8 @@
 
 #pragma endregion
 
+//////////////////////////////
+
 int main (void) {
 
     CbctLinha *cbctLinha = inicializarCbctLinha();
@@ -201,6 +206,8 @@ int main (void) {
 
     return EXIT_SUCCESS;
 }
+
+//////////////////////////////
 
 #pragma region PRINCIPAL
 
