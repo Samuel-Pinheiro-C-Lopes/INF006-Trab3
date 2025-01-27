@@ -170,33 +170,37 @@
 
 //////////////////////////////
 
-int main (void) 
-{
+#pragma region Main
 
-    CbctLinha *cbctLinha = inicializarCbctLinha();
-    FILE *entrada = fopen("L2Q2.in", "r");
-    FILE *saida = fopen("L2Q2.out", "w");
-
-    if (entrada == NULL)
+    int main (void) 
     {
-        printf("Falha ao ler ou entrada\n");
-        return EXIT_FAILURE;    
+
+        CbctLinha *cbctLinha = inicializarCbctLinha();
+        FILE *entrada = fopen("L2Q2.in", "r");
+        FILE *saida = fopen("L2Q2.out", "w");
+
+        if (entrada == NULL)
+        {
+            printf("Falha ao ler ou entrada\n");
+            return EXIT_FAILURE;    
+        }
+
+        if (saida == NULL)
+        {
+            printf("Falha ao designar arquivo de saída\n");
+            return EXIT_FAILURE;
+        }
+
+        lerTodasLinhas(cbctLinha, entrada);
+
+        atribuirCbctLinha(cbctLinha);
+
+        escreverSaida(cbctLinha, saida);
+
+        return EXIT_SUCCESS;
     }
 
-    if (saida == NULL)
-    {
-        printf("Falha ao designar arquivo de saída\n");
-        return EXIT_FAILURE;
-    }
-
-    lerTodasLinhas(cbctLinha, entrada);
-
-    atribuirCbctLinha(cbctLinha);
-
-    escreverSaida(cbctLinha, saida);
-
-    return EXIT_SUCCESS;
-}
+#pragma endregion
 
 //////////////////////////////
 
