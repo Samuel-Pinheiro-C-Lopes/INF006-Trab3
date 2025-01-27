@@ -115,6 +115,7 @@
 
         void atribuirListaArv(Lista *lista, Arvore *arv);
         void atribuirMaxAltPredArv(Arvore *arv);
+        void atribuirSaidaLinha(Linha *linha);
 
         #pragma endregion
 
@@ -138,6 +139,7 @@
             // principal
             void lerLista(Lista *lista, char *idxStr);
             void lerTodasLinhas(CbctLinha *cbctLinha, FILE *entrada);
+            char *escreverSaidaLinha(Linha *linha);
             // auxiliares
             int preencherStr(char *cadeia, char *conteudo);
             char* obterSubstr(char *str, char *separadores);
@@ -383,6 +385,19 @@ int main (void) {
     //////////////////////////////
 
     #pragma region Atribuir
+    
+        // Sumário: designa a string correspondente a saída esperada
+        // por essa linha com base na árvore e lista correspondente
+        // Parâmetros: <linha: linha alvo da atribuição>
+        // Retorna: <void>
+        void atribuirSaidaLinha(Linha *linha)
+        {
+            // necessário preencher com base no conteúdo escrito
+            // ao invés de designar o ponteiro pois
+            // escreverSaidaLinha retorna ponteiro para a string estática
+            // de seu escopo, deve ser utilizada apenas como alvo de cópia
+            preencherStr(linha->linhaSaida, escreverSaidaLinha(linha));
+        }
 
         // Sumário: atribui uma lista de valores a uma árvore de busca binária
         // Parâmetros: <lista: lista a ser lida> e <arv: árvore a ser escrita>
@@ -486,6 +501,48 @@ int main (void) {
     //////////////////////////////
 
     #pragma region String
+
+        // Sumário: escreve um texto de saída baseado nos campos preenchidos
+        // da linha
+        // Parâmetros: <linha: linha a ter seu campo de string de saída
+        // preenchido com base nas lista e árvore intrínsecas
+        // Return: <char *: ponteiro para o texto gerado>
+        char *escreverSaidaLinha(Linha *linha)
+        {
+            static char linhaStr[tam_max_linha];
+            char *idx = linhaStr;
+
+            for (ItemLista *itemAtual = linha->lista->inicio; itemAtual != NULL; itemAtual = itemAtual->prox)
+            {
+                // incrementa indexador com base na quantidade escrita
+                idx += sizeof(char) * 
+                    // preenche saída     // converte altura do elemento com chave correspondente
+                    preencherStr(idx, convIntStr(buscarNoArv(linha->arvore, itemAtual->valor)->altura));
+
+                idx[0] = ' ';
+                idx += sizeof(char);
+            }
+
+            idx += sizeof(char) * preencherStr(idx, "max ");
+            idx += sizeof(char) * preencherStr(idx, convIntStr(linha->arvore->max->valor));
+            idx += sizeof(char) * preencherStr(idx, " alt ");
+            idx += sizeof(char) * preencherStr(idx, convIntStr(linha->arvore->alt));
+            idx += sizeof(char) * preencherStr(idx, " pred ");
+            if (linha->arvore->pred != NULL)
+                idx += sizeof(char) * preencherStr(idx, convIntStr(linha->arvore->pred->valor));
+            else 
+                idx += sizeof(char) * preencherStr(idx, "NaN");
+
+            if (linha->prox != NULL)
+            {
+                idx[0] = '\n';
+                idx += sizeof(char);
+            }
+
+            idx[0] = '\0';
+
+            return linhaStr;
+        }
 
         // Sumário: Lê todas as linhas em formato de lista presentes em um arquivo de texto
         // Parâmetros: <cbctLinha: cbct de linha a  ser escrita> e <entrada: arquivo a ser
