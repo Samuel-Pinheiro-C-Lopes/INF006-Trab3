@@ -188,8 +188,13 @@ int main (void) {
     {
         atribuirListaArv(linhaAtual->lista, linhaAtual->arvore);
         atribuirMaxAltPredArv(linhaAtual->arvore);
+        atribuirSaidaLinha(linhaAtual);
     }
 
+    for (Linha *linhaAtual = cbctLinha->inicioLinha; linhaAtual != NULL; linhaAtual = linhaAtual->prox)
+    {
+        printf("%s\n", linhaAtual->linhaSaida);
+    }
     /*
     Lista *lista = inicializarLista();
 
@@ -448,8 +453,8 @@ int main (void) {
         No *buscarNoSubarv(No *noAtual, int chave)
         {
             if (noAtual == NULL || (noAtual->valor == chave && noAtual->checado == 0)) return noAtual;
-            else if (noAtual->valor >= chave) return buscarNoSubarv(noAtual->esquerda, chave);
-            else if (noAtual-> valor < chave) return buscarNoSubarv(noAtual->direita, chave);
+            else if (noAtual->valor > chave) return buscarNoSubarv(noAtual->esquerda, chave);
+            else if (noAtual-> valor <= chave) return buscarNoSubarv(noAtual->direita, chave);
         }
 
         // Sumário: busca o nó de maior valor na árvore
