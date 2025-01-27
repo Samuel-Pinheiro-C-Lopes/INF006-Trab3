@@ -424,7 +424,7 @@
             for (Linha *linhaAtual = cbctLinha->inicioLinha; linhaAtual != NULL; linhaAtual = linhaAtual->prox)
             {
                 atribuirListaArv(linhaAtual->lista, linhaAtual->arvore);
-                // [...]?
+                atribuirSomaNosArv(linhaAtual->arvore);
                 atribuirSaidaLinha(linhaAtual);
             }
         }
