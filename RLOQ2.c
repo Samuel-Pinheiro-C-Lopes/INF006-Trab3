@@ -67,6 +67,7 @@
             No *mae;
             int valor;
             int altura; // facilitar saída
+            int diferencaSomas; // facilitar saída
         };
 
     #pragma endregion
@@ -114,6 +115,9 @@
             void atribuirSaidaLinha(Linha *linha);
             // arvore
             void atribuirListaArv(Lista *lista, Arvore *arv);
+            // No
+            void atribuirSomaNosArv(Arvore *arv);
+            void atribuirSomaNosSubarv(No *subarv);
 
         #pragma endregion
 
@@ -385,6 +389,31 @@
     //////////////////////////////
 
     #pragma region Atribuir
+
+        // Sumário: atribui a diferença de soma de todos os nós
+        // de uma árvore a partir de sua raiz
+        // Parâmetros: <arv: árvore a ter seus nós atribuídos>
+        // Retorna: <void>
+        void atribuirSomaNosArv(Arvore *arv) 
+        {
+            atribuirSomaNosSubarv(arv->raiz);
+        }
+
+        // Sumário: atribui a soma de todos os nós de uma subárvore
+        // Parâmetros: <subarv: pode ser nulo, visto que a checagem demarca por NULL
+        // demarca sentinela da recursão>
+        // Retorna: <void>
+        void atribuirSomaNosSubarv(No *subarv) 
+        {   
+            if (subarv == NULL)
+                return; // fim recursão
+
+            // nó atual
+            subarv->diferencaSomas = diferencaSomaNosSubarv(subarv);
+
+            atribuirSomaNosSubarv(subarv->direita); // subarv da direita
+            atribuirSomaNosSubarv(subarv->esquerda); // subarv da esquerda
+        }
 
         // Sumário: realiza todas as atribuições necessárias para cada linha
         // presente no cabeçote, considerando que as listas de cada linha foram lidas
