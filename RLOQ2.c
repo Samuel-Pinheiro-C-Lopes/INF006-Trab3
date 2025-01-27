@@ -485,10 +485,31 @@
 
     #pragma region String
 
+        // Sumário: escreve a saída de todas as linha de um cabeçote 
+        // para o arquivo de saída alvo
+        // Parâmetros: <cbctLinha: cabeçote das linhas> e <saida: arquivo alvo>
+        // Retorna: <void>
         void escreverSaida(CbctLinha *cbctLinha, FILE *saida)
         {
             for (Linha *linhaAtual = cbctLinha->inicioLinha; linhaAtual != NULL; linhaAtual = linhaAtual->prox)
                 fprintf(saida, "%s", linhaAtual->linhaSaida);
+        }
+
+        // Sumário: escreve a parte da saída em um texto equivalente à altura e diferença de soma
+        // da árvore -> basta iniciar com a raíz da árvore | funciona em ordem
+        // Parâmetros: <subarv: subárvore> e <idx: indexador do texto preenchido>
+        // Retorna: <void>
+        void escreverSaidaSubarv(No* subarv, char *idx)
+        {
+            if (subarv == NULL)
+                return; // sentinela
+
+            escreverSaidaSubarv(subarv->esquerda, idx);
+            idx += sizeof(char) * preencherStr(idx, convIntStr(subarv->altura));
+            idx +=  sizeof(char) * preencherStr(idx, " (");
+            idx +=  sizeof(char) * preencherStr(idx, convIntStr(subarv->diferencaSomas));
+            idx +=  sizeof(char) * preencherStr(idx, ") ");
+            escreverSaidaSubarv(subarv->direita, idx);
         }
 
         // Sumário: escreve um texto de saída baseado nos campos preenchidos
@@ -502,10 +523,7 @@
             static char linhaStr[tam_max_linha];
             char *idx = linhaStr;
 
-            for (ItemLista *itemAtual = linha->lista->inicio; itemAtual != NULL; itemAtual = itemAtual->prox)
-            {
-                // [...]
-            }
+            escreverSaidaSubarv(linha->arvore->raiz, idx);
 
             if (linha->prox != NULL)
             {

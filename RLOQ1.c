@@ -525,6 +525,10 @@
 
     #pragma region String
 
+        // Sumário: escreve a saída de todas as linha de um cabeçote 
+        // para o arquivo de saída alvo
+        // Parâmetros: <cbctLinha: cabeçote das linhas> e <saida: arquivo alvo>
+        // Retorna: <void>
         void escreverSaida(CbctLinha *cbctLinha, FILE *saida)
         {
             for (Linha *linhaAtual = cbctLinha->inicioLinha; linhaAtual != NULL; linhaAtual = linhaAtual->prox)
