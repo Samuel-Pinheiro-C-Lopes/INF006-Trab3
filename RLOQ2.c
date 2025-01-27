@@ -523,7 +523,10 @@
             static char linhaStr[tam_max_linha];
             char *idx = linhaStr;
 
-            escreverSaidaSubarv(linha->arvore->raiz, idx);
+            if (linha != NULL && linha->arvore != NULL)
+                escreverSaidaSubarv(linha->arvore->raiz, idx);
+
+            idx -= sizeof(char);
 
             if (linha->prox != NULL)
             {
