@@ -139,6 +139,7 @@
             void lerTodasLinhas(CbctLinha *cbctLinha, FILE *entrada);
             void escreverSaida(CbctLinha *cbctLinha,FILE *saida);
             char *escreverSaidaLinha(Linha *linha);
+            void escreverSaidaSubarv(No* subarv, char **idx);
             // auxiliares
             int preencherStr(char *cadeia, char *conteudo);
             char* obterSubstr(char *str, char *separadores);
@@ -163,6 +164,7 @@
             // principal
             int diferencaSomaNosSubarv(No *subarv);
             int somaNosSubarv(No *subarv);
+            void _somaNosSubarv(No *subarv, int *soma);
             // auxiliares
             int expInt(int inteiro, int exp);
             int qntAlgsInt(int inteiro);
@@ -179,6 +181,11 @@
 
 #pragma region Main
 
+    // A leitura da árvore está originando nós duplicatos | ERRO | RESOLVIDO
+    // Aparentemente a atribuição da diferença da soma está com defeito! | ERRO | 
+    // Não está atribuindo a saída apropriadamente | ERRO
+    // Inconsistência na geração da string de saída no caso em que ocorre | ERRO
+    // CORRIGIR TODOS!
     int main (void) 
     {
 
@@ -331,13 +338,15 @@
         }
 
         // arvore
-        // Sumário: Adiciona um novo nó à árvore
+        // Sumário: Adiciona um novo nó de chave não presente na árvore à árvore
         // Parâmetros: <arv: árvore na qual ocorrerá a inserção> e 
         // <novoNo: nó a ser inserido>
         // Retorna: <void>
         void adicionarNoArv(Arvore *arv, No *novoNo) 
         {
-            if (arv->raiz == NULL)
+            if (buscarNoArv(arv, novoNo->valor) != NULL)
+                return;
+            else if (arv->raiz == NULL)
                 arv->raiz = novoNo;
             else if (buscarNoArv(arv, novoNo->valor) == NULL) // se ainda não houver
                 adicionarNoSubarv(arv->raiz, novoNo);
@@ -474,7 +483,7 @@
         // Retorna: <No *: ponteiro para o nó ou nulo se não houver>
         No *buscarNoSubarv(No *noAtual, int chave)
         {
-            if (noAtual == NULL) return noAtual;
+            if (noAtual == NULL || noAtual->valor == chave) return noAtual;
             else if (noAtual->valor > chave) return buscarNoSubarv(noAtual->esquerda, chave);
             else if (noAtual-> valor <= chave) return buscarNoSubarv(noAtual->direita, chave);
         }
@@ -499,16 +508,16 @@
         // da árvore -> basta iniciar com a raíz da árvore | funciona em ordem
         // Parâmetros: <subarv: subárvore> e <idx: indexador do texto preenchido>
         // Retorna: <void>
-        void escreverSaidaSubarv(No* subarv, char *idx)
+        void escreverSaidaSubarv(No* subarv, char **idx)
         {
             if (subarv == NULL)
                 return; // sentinela
 
             escreverSaidaSubarv(subarv->esquerda, idx);
-            idx += sizeof(char) * preencherStr(idx, convIntStr(subarv->altura));
-            idx +=  sizeof(char) * preencherStr(idx, " (");
-            idx +=  sizeof(char) * preencherStr(idx, convIntStr(subarv->diferencaSomas));
-            idx +=  sizeof(char) * preencherStr(idx, ") ");
+            *idx += sizeof(char) * preencherStr(*idx, convIntStr(subarv->valor));
+            *idx +=  sizeof(char) * preencherStr(*idx, " (");
+            *idx +=  sizeof(char) * preencherStr(*idx, convIntStr(subarv->diferencaSomas));
+            *idx +=  sizeof(char) * preencherStr(*idx, ") ");
             escreverSaidaSubarv(subarv->direita, idx);
         }
 
@@ -524,7 +533,7 @@
             char *idx = linhaStr;
 
             if (linha != NULL && linha->arvore != NULL)
-                escreverSaidaSubarv(linha->arvore->raiz, idx);
+                escreverSaidaSubarv(linha->arvore->raiz, &idx);
 
             idx -= sizeof(char);
 
@@ -571,7 +580,7 @@
                     default: adicionarItemLista(lista, inicializarItemLista(convStrInt(obterSubstr(idxStr, " "))));
                 }
                 idxStr += sizeof(char) * proxOcorrencia(idxStr, " ");
-                idxStr += sizeof(char) * proxOcorrencia(idxStr, "-123456789");
+                idxStr += sizeof(char) * proxOcorrencia(idxStr, "-0123456789");
             }
         }
 
@@ -587,14 +596,14 @@
         // Retorna: <diferença entre a soma da direita com a da esquerda>
         int diferencaSomaNosSubarv(No *subarv)
         {
-            int somaNosDireita;
-            int somaNosEsquerda;
+            int somaNosDireita = 0;
+            int somaNosEsquerda = 0;
 
             if (subarv->esquerda == NULL) somaNosEsquerda = 0;
-            else somaNosEsquerda = somaNosSubarv(subarv->esquerda);
+            else _somaNosSubarv(subarv->esquerda, &somaNosEsquerda);
 
             if (subarv->direita == NULL) somaNosDireita = 0;
-            else somaNosDireita = somaNosSubarv(subarv->direita);
+            else _somaNosSubarv(subarv->direita, &somaNosDireita);
 
             return somaNosDireita - somaNosEsquerda;
         }
@@ -603,6 +612,15 @@
         // somando todos á sua esquerda, direita com o seu próprio
         // Parâmetros: <subarv: subárvore alvo do cálculo>
         // Retorna: <int: soma>
+        void _somaNosSubarv(No *subarv, int *soma)
+        {
+            *soma += subarv->valor;
+            if (subarv->direita != NULL)
+                _somaNosSubarv(subarv->direita, soma);
+            if (subarv->esquerda != NULL)
+                _somaNosSubarv(subarv->esquerda, soma);
+        }
+
         int somaNosSubarv(No *subarv)
         {
             int valor = subarv->valor;
