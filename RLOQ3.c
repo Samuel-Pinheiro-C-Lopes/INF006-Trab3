@@ -129,6 +129,7 @@
 
         #pragma region Busca
 
+            No *buscarSucessor(No *subArv);
             No *buscarNoArv(Arvore *arv, int chave);
             No *buscarNoSubarv(No *noAtual, int chave);
 
@@ -391,12 +392,18 @@
 
     #pragma region Remover
 
-        /*
+        // Sumário: Realiza a remoção de um nó de determinada chave
+        // na árvore alvo.
+        // Parâmetros: <arv: árvore que terá um nó removido> e <chave: identidade
+        // do nó a ser removido>
+        // Retorna: <void>
         void removerNoArv(Arvore *arv, int chave) 
         {
-            
+            No *noAlvo = buscarNoArv(arv, chave);
+            No *subst;
+
         }
-        */
+        
 
     #pragma endregion
 
@@ -445,6 +452,21 @@
     //////////////////////////////
 
     #pragma region Buscar
+
+        // Sumário: Busca pelo nó sucessor do nó atual - ou seja, o próximo em ordem
+        // crescente.
+        // Parâmetro: <subArv: Nó submetido à busca>
+        // Retorna: <No *: ponteiro pro sucessor ou NULL se não houver>
+        No *buscarSucessor(No *subArv) 
+        {
+            No *atual;
+            
+            for (atual = subArv->direita; 
+                atual != NULL && atual->esquerda != NULL; 
+                atual = atual->esquerda);
+
+            return atual;
+        }
 
         // Sumário: Busca por um nó em uma árvore, o checa e retorna se encontrar
         // Parâmetros: <arv: árvore a ter um nó buscado> e <chave: valor de
