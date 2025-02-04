@@ -104,6 +104,14 @@
             void adicionarItemLista(Lista *lista, ItemLista *item);
 
         #pragma endregion
+        
+        //////////////////////////////  
+        
+        #pragma region Remover
+    
+            void removerNoArvore(Arvore *arv, int chave);
+
+        #pragma endregion
 
         //////////////////////////////
 
@@ -131,7 +139,7 @@
         #pragma region String
 
             // principal
-            void lerLista(Lista *lista, char *idxStr);
+            void lerComandos(Arvore *arv, char *idxStr);
             void lerTodasLinhas(CbctLinha *cbctLinha, FILE *entrada);
             void escreverSaida(CbctLinha *cbctLinha,FILE *saida);
             char *escreverSaidaLinha(Linha *linha);
@@ -381,6 +389,19 @@
 
     //////////////////////////////
 
+    #pragma region Remover
+
+        /*
+        void removerNoArv(Arvore *arv, int chave) 
+        {
+            
+        }
+        */
+
+    #pragma endregion
+
+    //////////////////////////////
+
     #pragma region Atribuir
 
         // Sumário: realiza todas as atribuições necessárias para cada linha
@@ -442,7 +463,7 @@
         // Retorna: <No *: ponteiro para o nó ou nulo se não houver>
         No *buscarNoSubarv(No *noAtual, int chave)
         {
-            if (noAtual == NULL) return noAtual;
+            if (noAtual == NULL || noAtual->valor == chave) return noAtual;
             else if (noAtual->valor > chave) return buscarNoSubarv(noAtual->esquerda, chave);
             else if (noAtual-> valor <= chave) return buscarNoSubarv(noAtual->direita, chave);
         }
@@ -501,7 +522,7 @@
             while (fgets(linhaStr, tam_max_linha, entrada) != NULL) {
                 // adiciona ao cbct       // nova linha    // nova lista       // nova árvore
                 adicionarLinha(cbctLinha, inicializarLinha(inicializarLista(), inicializarArvore()));
-                lerLista(cbctLinha->fimLinha->lista, linhaStr);
+                lerComandos(cbctLinha->fimLinha->arvore, linhaStr);
             }
         }
 
@@ -510,20 +531,32 @@
         // Parâmetros: <lista: lista a ser preenchida> e <idxStr: indexador atual
         // do texto de entrada>
         // Retorno: <void>
-        void lerLista(Lista *lista, char *idxStr)
-        { 
+        void lerComandos(Arvore *arv, char *idxStr)
+        {
+            char comando;
+            int numero;
+
             while (idxStr[0] != '\0')
             {
-                switch(proxCharStr(idxStr, "\n", 1))
+                idxStr += sizeof(char) * proxOcorrencia(idxStr, "ra\n");
+                comando = obterSubstr(idxStr, " ")[0];
+                idxStr += sizeof(char) * proxOcorrencia(idxStr, "-0123456789\n");
+                numero = convStrInt(obterSubstr(idxStr, " \n"));
+
+                switch(comando)
                 {
                     case ('\0'): // fim string
                     case ('\n'): break; // pula linha
-                            // insere                  // novo item        // converte // obtém substring
-                    // default:  [...]
-                    // adicionarItemLista(lista, inicializarItemLista(convStrInt(obterSubstr(idxStr, " "))));
+                    case ('a'): goto add;
+                    case ('r'): {
+                        if (buscarNoArv(arv, numero) == NULL)
+                            goto add;
+
+                        removerNoArv(arv, numero);
+                        break;
+                    }
+                    add: adicionarNoArv(arv, inicializarNo(convStrInt(obterSubstr(idxStr, " "))));
                 }
-                idxStr += sizeof(char) * proxOcorrencia(idxStr, " ");
-                idxStr += sizeof(char) * proxOcorrencia(idxStr, "-123456789");
             }
         }
 
