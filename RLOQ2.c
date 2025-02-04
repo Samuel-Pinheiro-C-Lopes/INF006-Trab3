@@ -504,7 +504,7 @@
                 fprintf(saida, "%s", linhaAtual->linhaSaida);
         }
 
-        // Sumário: escreve a parte da saída em um texto equivalente à altura e diferença de soma
+        // Sumário: escreve a parte da saída em um texto equivalente ao valor e diferença de soma
         // da árvore -> basta iniciar com a raíz da árvore | funciona em ordem
         // Parâmetros: <subarv: subárvore> e <idx: indexador do texto preenchido>
         // Retorna: <void>
