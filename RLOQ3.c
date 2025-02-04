@@ -109,7 +109,7 @@
         
         #pragma region Remover
     
-            void removerNoArvore(Arvore *arv, int chave);
+            void removerNoArv(Arvore *arv, int chave);
 
         #pragma endregion
 
@@ -400,8 +400,34 @@
         void removerNoArv(Arvore *arv, int chave) 
         {
             No *noAlvo = buscarNoArv(arv, chave);
-            No *subst;
 
+            // sentinela, não há o que remover
+            if (noAlvo == NULL) 
+                return;
+
+            No *subst_suc = buscarSucessor(noAlvo);
+            No *subst_ant = noAlvo->esquerda;
+
+            // caso em que há um sucessor a direita 
+            if (subst_suc != NULL)
+            {
+                // troca os valores
+                noAlvo->valor = subst_suc->valor;
+                // elimina
+                subst_suc->mae->esquerda = NULL;
+                return;
+            }
+            // caso não haja e o anterior não seja nulo, atribui o campo "mae"
+            else if (subst_ant != NULL)
+                subst_ant->mae = noAlvo->mae;
+
+            // em ambos os casos (antecessor NULL ou não) atribua
+            if (noAlvo->mae->direita == noAlvo)
+                noAlvo->mae->direita = subst_ant;
+            else 
+                noAlvo->mae->esquerda = subst_ant;
+
+            free(noAlvo);
         }
         
 
