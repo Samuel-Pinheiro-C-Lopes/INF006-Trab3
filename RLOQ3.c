@@ -185,8 +185,8 @@
     {
 
         CbctLinha *cbctLinha = inicializarCbctLinha();
-        FILE *entrada = fopen("L2Q2.in", "r");
-        FILE *saida = fopen("L2Q2.out", "w");
+        FILE *entrada = fopen("L2Q3.in", "r");
+        FILE *saida = fopen("L2Q3.out", "w");
 
         if (entrada == NULL)
         {
@@ -392,12 +392,120 @@
 
     #pragma region Remover
 
+    // Sumário: Realiza a remoção de um nó de determinada chave
+    // na árvore alvo.0
+    // Parâmetros: <arv: árvore que terá um nó removido> e <chave: identidade
+    // do nó a ser removido>
+    // Retorna: <void>
+    void removerNoArv(Arvore *arv, int chave) 
+    {
+        No *noAlvo = buscarNoArv(arv, chave);
+        No *x;
+        No *y;
+
+        // sentinela, não há o que remover
+        if (noAlvo == NULL) 
+            return;
+
+        if (noAlvo->esquerda == NULL || noAlvo->direita == NULL)
+        {
+            y = noAlvo;
+        }
+        else
+        {
+            y = buscarSucessor(noAlvo);
+        }
+
+        if (y->esquerda != NULL)
+        {
+            x = y->esquerda;
+        }
+        else
+        {
+            x = y->direita;
+        }
+
+        if (x != NULL)
+        {
+            x->mae = y->mae;
+        }
+
+        if (y->mae == NULL)
+        {
+            arv->raiz = x;
+        }
+        else
+        {
+            if (y->mae->esquerda == y)
+            {
+                y->mae->esquerda = x;
+            }
+            else
+            {
+                y->mae->direita = x;
+            }
+        }
+        if (y != noAlvo)
+        {
+            noAlvo->valor = y->valor;
+        }
+
+        free(noAlvo);
+    }
+
+    /*
+    Node *y;
+    Node *x;
+    if (z->left == NULL || z->right == NULL)
+    {
+        y = z;
+    }
+    else
+    {
+        y = treeSuccessor(z);
+    }
+
+    if (y->left != NULL)
+    {
+        x = y->left;
+    }
+    else
+    {
+        x = y->right;
+    }
+
+    if (x != NULL)
+    {
+        x->p = y->p;
+    }
+
+    if (y->p == NULL)
+    {
+        t->root = x;
+    }
+    else
+    {
+        if (y->p->left == y)
+        {
+            y->p->left = x;
+        }
+        else
+        {
+            y->p->right = x;
+        }
+    }
+    if (y != z)
+    {
+        z->key = y->key;
+    }
+    */
+
         // Sumário: Realiza a remoção de um nó de determinada chave
-        // na árvore alvo.
+        // na árvore alvo.0
         // Parâmetros: <arv: árvore que terá um nó removido> e <chave: identidade
         // do nó a ser removido>
         // Retorna: <void>
-        void removerNoArv(Arvore *arv, int chave) 
+        void _removerNoArv(Arvore *arv, int chave) 
         {
             No *noAlvo = buscarNoArv(arv, chave);
 
@@ -421,11 +529,13 @@
             else if (subst_ant != NULL)
                 subst_ant->mae = noAlvo->mae;
 
-            // em ambos os casos (antecessor NULL ou não) atribua
-            if (noAlvo->mae->direita == noAlvo)
-                noAlvo->mae->direita = subst_ant;
-            else 
-                noAlvo->mae->esquerda = subst_ant;
+            if (noAlvo->mae != NULL) {
+                // em ambos os casos (antecessor NULL ou não) atribua
+                if (noAlvo->mae->direita == noAlvo)
+                    noAlvo->mae->direita = subst_ant;
+                else 
+                    noAlvo->mae->esquerda = subst_ant;
+            }
 
             free(noAlvo);
         }
@@ -486,7 +596,19 @@
         No *buscarSucessor(No *subArv) 
         {
             No *atual;
-            
+
+            // caso não haja nó à direita e for filho da esquerda, sucessor é a mãe
+            if (subArv->direita == NULL)
+            {
+                if (subArv->mae != NULL && subArv->mae->esquerda == subArv)
+                    return subArv->mae;
+                else 
+                // se não, 
+                    return NULL;
+            }
+
+            // caso haja, encontro o sucessor através do mais à esquerda
+            // da direita
             for (atual = subArv->direita; 
                 atual != NULL && atual->esquerda != NULL; 
                 atual = atual->esquerda);
@@ -586,10 +708,10 @@
 
             while (idxStr[0] != '\0')
             {
-                idxStr += sizeof(char) * proxOcorrencia(idxStr, "ra\n");
+                idxStr += sizeof(char) * proxOcorrencia(idxStr, "ra");
                 comando = obterSubstr(idxStr, " ")[0];
                 idxStr += sizeof(char) * proxOcorrencia(idxStr, "-0123456789\n");
-                numero = convStrInt(obterSubstr(idxStr, " \n"));
+                numero = convStrInt(obterSubstr(idxStr, " "));
 
                 switch(comando)
                 {
@@ -603,7 +725,7 @@
                         removerNoArv(arv, numero);
                         break;
                     }
-                    add: adicionarNoArv(arv, inicializarNo(convStrInt(obterSubstr(idxStr, " "))));
+                    add: adicionarNoArv(arv, inicializarNo(numero));
                 }
             }
         }
