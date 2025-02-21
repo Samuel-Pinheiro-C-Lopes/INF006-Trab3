@@ -27,11 +27,6 @@
             Linha *fimLinha;
         };
 
-        // sumário: gerência as estruturas de entrada e saída -
-        // lista e árvore, respectivamente
-        // Como o cabeçote de lista e a árvore tem ponteiro para
-        // próximo, ele é capaz de armazenar as listas e árvores
-        // correspondentes a cada linha
         struct linha {
             Linha *prox;
             Arvore *arvore;
@@ -52,10 +47,6 @@
             int valor;
         };
 
-        // sumário: árvore que guardará os dados esperados da saída
-        // em sua estrutura, como max, pred, alt e os nós cujos
-        // níveis permitirão a contagem para a linha de saída.
-        // Também armazena a linha de saída correspondente à árvore.
         struct arvore {
             No *raiz;
         };
@@ -140,7 +131,7 @@
         #pragma region String
 
             // principal
-            void lerComandos(Arvore *arv, char *idxStr);
+            void lerComandos(Lista *lista, char *idxStr);
             void lerTodasLinhas(CbctLinha *cbctLinha, FILE *entrada);
             void escreverSaida(CbctLinha *cbctLinha,FILE *saida);
             char *escreverSaidaLinha(Linha *linha);
@@ -150,6 +141,7 @@
             int proxOcorrencia(char *str, char *alvos);
             int checarCharInt(char c);
             char proxCharStr(char *cadeia, char *separadores, int intervalo);
+            void printarArvoreOrdenada(No *no, char **idx);
 
         #pragma endregion
 
@@ -227,9 +219,6 @@
                 return novoCbct;
             }
 
-            // Sumário: inicializa novo gerente de linhas
-            // Parâmetros: <void>
-            // Retorno: ponteiro para novo gerente
             Linha *inicializarLinha(Lista *lista, Arvore *arv) {
                 Linha *novaLinha = (Linha *) malloc(sizeof(Linha));
                 novaLinha->arvore = arv;
@@ -237,19 +226,12 @@
                 return novaLinha;
             }
 
-            // arvore
-            // Sumário: inicializa nova árvore
-            // Parâmetros: <void>
-            // Retorno: ponteiro para nova árvore
             Arvore *inicializarArvore() {
                 Arvore *novaArvore = (Arvore *) malloc(sizeof(Arvore));
                 novaArvore->raiz = NULL;
                 return novaArvore;
             }
 
-            // Sumário: inicializa novo nó
-            // Parâmetros: <valor: valor do novo nó>
-            // Retorno: ponteiro para novo nó
             No *inicializarNo(int valor) {
                 No *novoNo = (No *) malloc(sizeof(No));
                 novoNo->altura = 0;
@@ -260,19 +242,12 @@
                 return novoNo;
             }
 
-            // lista
-            // Sumário: inicializa nova lista
-            // Parâmetros: <void>
-            // Retorno: ponteiro para nova lista
             Lista *inicializarLista() {
                 Lista *novaLista = (Lista *) malloc(sizeof(Lista));
                 novaLista->inicio = NULL;
                 return novaLista;
             }
 
-            // Sumário: inicializa novo item de lista
-            // Parâmetros: <valor: valor do item>
-            // Retorno: ponteiro para novo item
             ItemLista *inicializarItemLista(int valor) {
                 ItemLista *novoItem = (ItemLista *) malloc(sizeof(ItemLista));
                 novoItem->valor = valor;
@@ -286,41 +261,6 @@
 
     #pragma region Adicionar
 
-        /*
-        // ger
-        // Sumário: Adiciona uma lista de itens ao gerente de linhas
-        // Parâmetros: <ger: gerente a ter lista adicionada> e <lista: 
-        // lista a ser adicionada>
-        // Retorna: <void>
-        void adicionarLista(Linha *linha, Lista *lista) 
-        {
-            if (ger->inicioListas == NULL)
-                ger->inicioListas = ger->fimListas = lista;
-            else 
-            {
-                ger->fimListas->prox = lista;
-                ger->fimListas = lista;
-            }
-        }
-        */
-
-        /*
-        // Sumário: Adiciona uma árvore ao gerente de linhas
-        // Parâmetros: <ger: gerente a ter a árvore adicionada> e <arv:
-        // árvore a ser adicionada>
-        // Retorna: <void>
-        void adicionarArvore(GerLinhas *ger, Arvore *arv) 
-        {
-            if (ger->inicioArvores == NULL)
-                ger->inicioArvores = ger->fimArvores = arv;
-            else 
-            {
-                ger->fimArvores->prox = arv;
-                ger->fimArvores = arv;
-            }
-        }
-        */
-
         void adicionarLinha(CbctLinha *cbct, Linha *novaLinha)
         {
             if (cbct->inicioLinha == NULL)
@@ -332,49 +272,40 @@
             }
         }
 
-        // arvore
-        // Sumário: Adiciona um novo nó à árvore
-        // Parâmetros: <arv: árvore na qual ocorrerá a inserção> e 
-        // <novoNo: nó a ser inserido>
-        // Retorna: <void>
         void adicionarNoArv(Arvore *arv, No *novoNo) 
         {
-            if (arv->raiz == NULL)
+            if (arv->raiz == NULL) {
+                novoNo->altura = 0;  // A raiz sempre tem altura 0
                 arv->raiz = novoNo;
-            else 
+            } else {
                 adicionarNoSubarv(arv->raiz, novoNo);
+            }
         }
 
-        // Sumário: Recursão auxiliar para adicionar nó na subárvore
-        // Parâmetros: <No: no atual da subárvore> e <novoNo: nó a 
-        // ser inserido>
-        // Retorna: <void>
+
         void adicionarNoSubarv(No *noAtual, No *novoNo) 
         {
             novoNo->mae = noAtual;
-            novoNo->altura += 1;
             
-            if (noAtual->valor > novoNo->valor) 
+            if (novoNo->valor < noAtual->valor) 
             {
                 if (noAtual->esquerda != NULL)
                     adicionarNoSubarv(noAtual->esquerda, novoNo);
                 else
                     noAtual->esquerda = novoNo;
-            }
+            } 
             else 
             {
                 if (noAtual->direita != NULL)
                     adicionarNoSubarv(noAtual->direita, novoNo);
-                else 
+                else
                     noAtual->direita = novoNo;
             }
+            
+            novoNo->altura = novoNo->mae->altura + 1;
         }
 
-        // lista
-        // Sumário: adiciona um item à lista
-        // Parâmetros: <lista: lista na qual ocorrerá a inserção> e 
-        // <item: item a ser inserido>
-        // Retorna: <void>
+
         void adicionarItemLista(Lista *lista, ItemLista *item) 
         {
             if (lista->inicio == NULL)
@@ -392,11 +323,6 @@
 
     #pragma region Remover
 
-    // Sumário: Realiza a remoção de um nó de determinada chave
-    // na árvore alvo.0
-    // Parâmetros: <arv: árvore que terá um nó removido> e <chave: identidade
-    // do nó a ser removido>
-    // Retorna: <void>
     void removerNoArv(Arvore *arv, int chave) 
     {
         No *noAlvo = buscarNoArv(arv, chave);
@@ -453,134 +379,32 @@
         free(noAlvo);
     }
 
-    /*
-    Node *y;
-    Node *x;
-    if (z->left == NULL || z->right == NULL)
-    {
-        y = z;
-    }
-    else
-    {
-        y = treeSuccessor(z);
-    }
-
-    if (y->left != NULL)
-    {
-        x = y->left;
-    }
-    else
-    {
-        x = y->right;
-    }
-
-    if (x != NULL)
-    {
-        x->p = y->p;
-    }
-
-    if (y->p == NULL)
-    {
-        t->root = x;
-    }
-    else
-    {
-        if (y->p->left == y)
-        {
-            y->p->left = x;
-        }
-        else
-        {
-            y->p->right = x;
-        }
-    }
-    if (y != z)
-    {
-        z->key = y->key;
-    }
-    */
-
-        // Sumário: Realiza a remoção de um nó de determinada chave
-        // na árvore alvo.0
-        // Parâmetros: <arv: árvore que terá um nó removido> e <chave: identidade
-        // do nó a ser removido>
-        // Retorna: <void>
-        void _removerNoArv(Arvore *arv, int chave) 
-        {
-            No *noAlvo = buscarNoArv(arv, chave);
-
-            // sentinela, não há o que remover
-            if (noAlvo == NULL) 
-                return;
-
-            No *subst_suc = buscarSucessor(noAlvo);
-            No *subst_ant = noAlvo->esquerda;
-
-            // caso em que há um sucessor a direita 
-            if (subst_suc != NULL)
-            {
-                // troca os valores
-                noAlvo->valor = subst_suc->valor;
-                // elimina
-                subst_suc->mae->esquerda = NULL;
-                return;
-            }
-            // caso não haja e o anterior não seja nulo, atribui o campo "mae"
-            else if (subst_ant != NULL)
-                subst_ant->mae = noAlvo->mae;
-
-            if (noAlvo->mae != NULL) {
-                // em ambos os casos (antecessor NULL ou não) atribua
-                if (noAlvo->mae->direita == noAlvo)
-                    noAlvo->mae->direita = subst_ant;
-                else 
-                    noAlvo->mae->esquerda = subst_ant;
-            }
-
-            free(noAlvo);
-        }
-        
-
     #pragma endregion
 
     //////////////////////////////
 
     #pragma region Atribuir
 
-        // Sumário: realiza todas as atribuições necessárias para cada linha
-        // presente no cabeçote, considerando que as listas de cada linha foram lidas
-        // Parâmetros: <cbctLinha: cabeçote cujas linhas serão atribuídas>
-        // Retorna: <void>
+    
         void atribuirCbctLinha(CbctLinha *cbctLinha) 
         {
             for (Linha *linhaAtual = cbctLinha->inicioLinha; linhaAtual != NULL; linhaAtual = linhaAtual->prox)
             {
-                atribuirListaArv(linhaAtual->lista, linhaAtual->arvore);
-                // [...]?
                 atribuirSaidaLinha(linhaAtual);
             }
         }
     
-        // Sumário: designa a string correspondente a saída esperada
-        // por essa linha com base na árvore e lista correspondente
-        // Parâmetros: <linha: linha alvo da atribuição>
-        // Retorna: <void>
+
         void atribuirSaidaLinha(Linha *linha)
         {
-            // necessário preencher com base no conteúdo escrito
-            // ao invés de designar o ponteiro pois
-            // escreverSaidaLinha retorna ponteiro para a string estática
-            // de seu escopo, deve ser utilizada apenas como alvo de cópia
             preencherStr(linha->linhaSaida, escreverSaidaLinha(linha));
         }
 
-        // Sumário: atribui uma lista de valores a uma árvore de busca binária
-        // Parâmetros: <lista: lista a ser lida> e <arv: árvore a ser escrita>
-        // Retorna: <void>
         void atribuirListaArv(Lista *lista, Arvore *arv)
         {
-            for (ItemLista *itemAtual = lista->inicio; itemAtual != NULL; itemAtual = itemAtual->prox)
+            for (ItemLista *itemAtual = lista->inicio; itemAtual != NULL; itemAtual = itemAtual->prox){
                 adicionarNoArv(arv, inicializarNo(itemAtual->valor));
+            }
         }
 
     #pragma endregion
@@ -597,7 +421,6 @@
         {
             No *atual;
 
-            // caso não haja nó à direita e for filho da esquerda, sucessor é a mãe
             if (subArv->direita == NULL)
             {
                 if (subArv->mae != NULL && subArv->mae->esquerda == subArv)
@@ -607,8 +430,6 @@
                     return NULL;
             }
 
-            // caso haja, encontro o sucessor através do mais à esquerda
-            // da direita
             for (atual = subArv->direita; 
                 atual != NULL && atual->esquerda != NULL; 
                 atual = atual->esquerda);
@@ -616,26 +437,16 @@
             return atual;
         }
 
-        // Sumário: Busca por um nó em uma árvore, o checa e retorna se encontrar
-        // Parâmetros: <arv: árvore a ter um nó buscado> e <chave: valor de
-        // busca>
-        // Retorna: <No *: ponteiro para o nó ou nulo se não houver>
         No *buscarNoArv(Arvore *arv, int chave)
         {
             return buscarNoSubarv(arv->raiz, chave);
         }
 
-        // Sumário: função auxiliar recursiva para realizar a busca do nó de chave
-        // equivalente à passada, retornando o Nó ou NULL
-        // Parâmetros: <noAtual: nó atual da recursão, representa raiz da
-        // subárvore avaliada> e <chave: valor de
-        // busca>
-        // Retorna: <No *: ponteiro para o nó ou nulo se não houver>
         No *buscarNoSubarv(No *noAtual, int chave)
         {
             if (noAtual == NULL || noAtual->valor == chave) return noAtual;
             else if (noAtual->valor > chave) return buscarNoSubarv(noAtual->esquerda, chave);
-            else if (noAtual-> valor <= chave) return buscarNoSubarv(noAtual->direita, chave);
+            else if (noAtual-> valor < chave) return buscarNoSubarv(noAtual->direita, chave);
         }
 
     #pragma endregion
@@ -644,32 +455,18 @@
 
     #pragma region String
     
-        // Sumário: escreve a saída de todas as linha de um cabeçote 
-        // para o arquivo de saída alvo
-        // Parâmetros: <cbctLinha: cabeçote das linhas> e <saida: arquivo alvo>
-        // Retorna: <void>
         void escreverSaida(CbctLinha *cbctLinha, FILE *saida)
         {
             for (Linha *linhaAtual = cbctLinha->inicioLinha; linhaAtual != NULL; linhaAtual = linhaAtual->prox)
                 fprintf(saida, "%s", linhaAtual->linhaSaida);
         }
-
-        // Sumário: escreve um texto de saída baseado nos campos preenchidos
-        // da linha
-        // Parâmetros: <linha: linha a ter seu campo de string de saída
-        // preenchido com base nas lista e árvore intrínsecas
-        // Return: <char *: ponteiro para o texto gerado>
-        // !!!! ALTERAÇÕES PENDENTES !!!!
+        
         char *escreverSaidaLinha(Linha *linha)
         {
             static char linhaStr[tam_max_linha];
             char *idx = linhaStr;
-
-            for (ItemLista *itemAtual = linha->lista->inicio; itemAtual != NULL; itemAtual = itemAtual->prox)
-            {
-                // [...]
-            }
-
+            printarArvoreOrdenada(linha->arvore->raiz, &idx);
+            idx -=sizeof(char);
             if (linha->prox != NULL)
             {
                 idx[0] = '\n';
@@ -681,54 +478,92 @@
             return linhaStr;
         }
 
-        // Sumário: Lê todas as linhas em formato de lista presentes em um arquivo de texto
-        // Parâmetros: <cbctLinha: cbct de linha a  ser escrita> e <entrada: arquivo a ser
-        // lido>
-        // Retorna: <void>
+        void printarArvoreOrdenada(No *subarv, char **idx){
+            if (!subarv)
+                return;
+
+            printarArvoreOrdenada(subarv->esquerda, idx);
+            *idx += sizeof(char) * preencherStr(*idx, convIntStr(subarv->valor));
+            *idx +=  sizeof(char) * preencherStr(*idx, " (");
+            *idx +=  sizeof(char) * preencherStr(*idx, convIntStr(subarv->altura));
+            *idx +=  sizeof(char) * preencherStr(*idx, ") ");
+            printarArvoreOrdenada(subarv->direita, idx);
+        }
+
         void lerTodasLinhas(CbctLinha *cbctLinha, FILE *entrada)
         {
             static char linhaStr[tam_max_linha];
 
             while (fgets(linhaStr, tam_max_linha, entrada) != NULL) {
-                // adiciona ao cbct       // nova linha    // nova lista       // nova árvore
-                adicionarLinha(cbctLinha, inicializarLinha(inicializarLista(), inicializarArvore()));
-                lerComandos(cbctLinha->fimLinha->arvore, linhaStr);
+                Lista *novaLista = inicializarLista();  
+                Arvore *novaArvore = inicializarArvore();  
+                Linha *novaLinha = inicializarLinha(novaLista, novaArvore);
+
+                adicionarLinha(cbctLinha, novaLinha);
+
+                lerComandos(novaLista, linhaStr);
+                atribuirListaArv(novaLista, novaArvore);
             }
         }
 
-        // Sumário: Lê uma lista de uma entrada de texto, cujos números inteiros devem ser
-        // espaçados em 1 entre si Navega pelos espaços.
-        // Parâmetros: <lista: lista a ser preenchida> e <idxStr: indexador atual
-        // do texto de entrada>
-        // Retorno: <void>
-        void lerComandos(Arvore *arv, char *idxStr)
+        void lerComandos(Lista *lista, char *idxStr)
         {
             char comando;
             int numero;
 
-            while (idxStr[0] != '\0')
+            while (*idxStr != '\0')
             {
-                idxStr += sizeof(char) * proxOcorrencia(idxStr, "ra");
-                comando = obterSubstr(idxStr, " ")[0];
-                idxStr += sizeof(char) * proxOcorrencia(idxStr, "-0123456789\n");
-                numero = convStrInt(obterSubstr(idxStr, " "));
+                while (*idxStr == ' ') idxStr+=sizeof(char);  // Pula espaços
+                
+                comando = *idxStr;  
+                idxStr+=sizeof(char);  
 
-                switch(comando)
-                {
-                    case ('\0'): // fim string
-                    case ('\n'): break; // pula linha
-                    case ('a'): goto add;
-                    case ('r'): {
-                        if (buscarNoArv(arv, numero) == NULL)
-                            goto add;
+                while (*idxStr == ' ') idxStr+=sizeof(char);  // Pula espaços após o comando
 
-                        removerNoArv(arv, numero);
-                        break;
+                numero = convStrInt(idxStr);  
+                
+                while (*idxStr != ' ' && *idxStr != '\n' && *idxStr != '\0') idxStr+=sizeof(char); // Avança para o próximo caractere
+
+                if (comando == 'a') {
+                    adicionarItemLista(lista, inicializarItemLista(numero));  
+                }
+                else if (comando == 'r') {
+                    // Verifica se o número já está na lista
+                    ItemLista *atual = lista->inicio;
+                    ItemLista *anterior = NULL;
+                    int encontrado = 0;
+
+                    while (atual != NULL) {
+                        if (atual->valor == numero) {
+                            // Remove o nó da lista
+                            if (anterior == NULL) {
+                                lista->inicio = atual->prox;
+                            } else {
+                                anterior->prox = atual->prox;
+                            }
+
+                            if (atual == lista->fim) {
+                                lista->fim = anterior;
+                            }
+
+                            free(atual);
+                            encontrado = 1;
+                            break;
+                        }
+                        anterior = atual;
+                        atual = atual->prox;
                     }
-                    add: adicionarNoArv(arv, inicializarNo(numero));
+
+                    // Se o número não foi encontrado, adicionamos ele
+                    if (!encontrado) {
+                        adicionarItemLista(lista, inicializarItemLista(numero));
+                    }
                 }
             }
         }
+
+        
+
 
     #pragma endregion
 
@@ -746,13 +581,6 @@
 
         //////////////////////////////
 
-        // Sumário: Preenche a cadeia alvo com o conteúdo
-        // até o fim do conteúdo.
-        // Não checa pelo final da cadeia alvo, podendo tentar atribuir memória não alocada
-        // para a cadeia
-        // Parâmetros: <cadeia: vetor de caracteres alvo a ser preenchido> e <conteudo:
-        // vetor de caracteres que deve preencher o alvo>
-        // Retorna: <int: quantos caracteres foram preenchidos>
         int preencherStr(char *cadeia, char *conteudo)
         {
             int cont = 0;
@@ -766,13 +594,7 @@
             return cont;
         }
 
-        // Sumário: obtém a substring de início igual ao ponteiro de caracter
-        // passado e final fim da cadeia ou primeira ocorrência de um dos 
-        // separadores
-        // Parâmetros: <str: ponteiro para o início da string> e <separadores:
-        // string dos separadores, caracteres que finalizam a substring além do
-        // '\0'
-        // Retorna: ponteiro para a substring formada.
+
         char* obterSubstr(char *str, char *separadores) 
         {
             static char substr[tam_max_substr];
@@ -796,11 +618,6 @@
 
         //////////////////////////////
 
-        // Sumário: busca pela próxima ocorrência de certos alvos
-        // em uma string e retorna quantidade de passos até chegar nela
-        // Parâmetros: <str: string alvo> <alvos: caracteres que finalizarão
-        // a busca>
-        // Retorna: <int: quantidade de avanços até a primeira ocorrência de um dos alvos>
         int proxOcorrencia(char *str, char *alvos) 
         {
             char *idx = str;
@@ -813,8 +630,6 @@
                     if (alvos[j] == str[i])
                         goto fim;
 
-            // retorna ponteiro da primeira ocorrência 
-            // de um dos alvos ou '\0'
             fim: return i; 
         }
 
@@ -828,11 +643,6 @@
                 return 0;
         }
 
-        // Sumário: busca em uma cadeia a primeira ocorrência de um ou mais 
-        // caracteres de separação em um intervalo, retornando essa ocorrência
-        // Parâmetros: <cadeia: cadeia de caracteres de entrada>, <separadores: caracteres de busca> e
-        // <intervalo: quantos caracteres contando com o atual devem ser lidos a partir do indexador>
-        // Returna: <char: caracter da ocorrência encontrada> 
         char proxCharStr(char *cadeia, char *separadores, int intervalo)
         {
             // contadores
@@ -861,9 +671,7 @@
 
         //////////////////////////////
 
-        // Sumário: converte um texto para seu equivalente numérico inteiro
-        // Parâmetros: <str: indexador da string a ser convertida>
-        // Retorna: <int: numero resultante>
+
         int convStrInt(char* str)
         {
             // propriedades
@@ -927,11 +735,6 @@
     #pragma region Matematica
 
         //////////////////////////////
-
-        // Sumário: Obtém a quantidade de algarismos presentes em um número
-        // inteiro
-        // Parâmetros: <inteiro: número cujos algarismos devem ser contabilizados>
-        // Retorna: <int: quantidade de algarismos>
         int qntAlgsInt(int inteiro)
         {
             static int qntAlgs;
@@ -945,9 +748,6 @@
             return qntAlgs;
         }
 
-        // Sumário: eleva um determinado número inteiro por um expoente também inteiro
-        // Parâmetros: <inteiro: número a ser elevado, base> e <expoente>
-        // Retorna: <int: resultado da exponencialização>
         int expInt(int inteiro, int exp)
         {
             int resultado = inteiro;
